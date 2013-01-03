@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.jsoftware</groupId>
+	<artifactId>javamail-file-transport</artifactId>
+	<version>1.4.5</version>
+	<name>JavaMail Transport for smtpfile protocol. This protocol saves messages on local file system</name>
+	<description>Saves sent mails in local filesystem.</description>
+	<url>http://maven.apache.org</url>
+
+	<dependencies>
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>javax.mail-api</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>	
+	</dependencies>
+
+
+	<build>
+    	    <plugins>
+        	<plugin>
+                   <artifactId>maven-compiler-plugin</artifactId>
+                   <version>2.0.2</version>
+                   <configuration>
+                           <source>1.5</source>
+                           <target>1.5</target>
+                   </configuration>
+        	</plugin>
+	    </plugins>
+	</build>
+
+
+	<distributionManagement>
+		<repository>
+			<id>jsLocal</id>
+			<name>myCompanyReporsitory</name>
+			<url>file:///home/maven-repo/maven-repo-public/</url>
+		</repository>
+	</distributionManagement>
+
+</project>
