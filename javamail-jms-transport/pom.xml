@@ -15,4 +15,13 @@
 	<description>JavaMail Transport that is saveing email into JMS queue. There is also MessageBean that recieves those messages and sends it into real javamial.</description>
 	<url>http://maven.apache.org</url>
 
+	
+	<dependencies>
+	    <dependency>
+			<groupId>javax.jms</groupId>
+			<artifactId>jms</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+	
 </project>

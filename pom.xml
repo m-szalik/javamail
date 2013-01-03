@@ -24,7 +24,7 @@
 
 
 	<build>
-    	    <plugins>
+        <plugins>
         	<plugin>
                    <artifactId>maven-compiler-plugin</artifactId>
                    <version>2.0.2</version>
@@ -44,6 +44,17 @@
 			<url>file:///home/maven-repo/maven-repo-public/</url>
 		</repository>
 	</distributionManagement>
+	
+	
+	<dependencyManagement>
+	    <dependencies>
+	        <dependency>
+				<groupId>javax.jms</groupId>
+				<artifactId>jms</artifactId>
+				<version>1.1</version>
+			</dependency>
+	    </dependencies>
+	</dependencyManagement>
 
 	<modules>
 		<module>javamail-file-transport</module>
