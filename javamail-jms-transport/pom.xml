@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jsoftware</groupId>
 	<artifactId>javamail-jms-transport</artifactId>
-	<version>1.4.5</version>
+	<version>1.4.4</version>
 	<parent>
 	    <groupId>org.jsoftware</groupId>
 		<artifactId>javamail</artifactId>
-		<version>1.4.5</version>
+		<version>1.4.4</version>
 	</parent>
 	
 	<name>JavaMail Transport that is saveing email into JMS queue.</name>

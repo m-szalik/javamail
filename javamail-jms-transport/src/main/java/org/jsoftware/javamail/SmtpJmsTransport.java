@@ -3,6 +3,7 @@ package org.jsoftware.javamail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.logging.Logger;
 
 import javax.jms.BytesMessage;
@@ -98,14 +99,15 @@ public class SmtpJmsTransport extends Transport {
 		BytesMessage jms = queueSession.createBytesMessage();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
-			msg.writeTo(baos);
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject(addresses == null ? new Address[0] : addresses);
+			msg.writeTo(oos);
 		} catch (IOException e) {
 			MessagingException mex = new MessagingException();
 			mex.initCause(e);
 			throw mex;
 		}
 		jms.writeBytes(baos.toByteArray());
-		jms.setObjectProperty("addresses", addresses);
 		jms.setJMSPriority(prio);
 		return jms;
 	}

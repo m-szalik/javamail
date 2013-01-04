@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jsoftware</groupId>
 	<artifactId>javamail-file-transport</artifactId>
-	<version>1.4.5</version>
+	<version>1.4.4</version>
 	<parent>
 	    <groupId>org.jsoftware</groupId>
-		<artifactId>javamail</artifactId>
-		<version>1.4.5</version>
+	    <artifactId>javamail</artifactId>
+	    <version>1.4.4</version>
 	</parent>
 	
 	<name>JavaMail Transport for smtpfile protocol. This protocol saves messages on local file system</name>

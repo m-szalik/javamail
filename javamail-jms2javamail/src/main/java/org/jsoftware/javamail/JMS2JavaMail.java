@@ -2,6 +2,7 @@ package org.jsoftware.javamail;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,8 +40,10 @@ public class JMS2JavaMail implements MessageListener {
 					if (r < 0) break;
 					baos.write(buf, 0, r);
 				} while (true);
-				MimeMessage mimeMessage = new MimeMessage(session, new ByteArrayInputStream(baos.toByteArray()));
-				Address[] addresses = (Address[]) bmsg.getObjectProperty("addresses");
+				ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+				ObjectInputStream ois = new ObjectInputStream(bais);
+				Address[] addresses = (Address[]) ois.readObject();
+				MimeMessage mimeMessage = new MimeMessage(session, ois);
 				session.getTransport().sendMessage(mimeMessage, addresses);
 				ack(message);
 			} catch(Exception ex) {
