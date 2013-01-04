@@ -66,7 +66,6 @@ public class SmtpJmsTransport extends Transport {
 			queueConnection.start();
 			queueSender.setDeliveryMode(DeliveryMode.PERSISTENT);
 			queueSender.send(createJmsMessage(queueSession, msg, addresses));
-			queueSession.commit();
 		} catch(JMSException ex) {
 			throw new MessagingException("Cannot send message to JMS queue.", ex);
 		} finally {
