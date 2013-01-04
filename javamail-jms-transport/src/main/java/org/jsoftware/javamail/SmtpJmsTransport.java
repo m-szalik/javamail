@@ -33,22 +33,32 @@ public class SmtpJmsTransport extends Transport {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private final QueueConnectionFactory queueConnectionFactory;
 	private final Queue mailQueue;
-
+	private final boolean validateFrom;
 	
 	public SmtpJmsTransport(Session session, URLName urlname) {
 		super(session, urlname);
 		try {
 			InitialContext initialContext = new InitialContext();
-			queueConnectionFactory = (QueueConnectionFactory) initialContext.lookup("jms/queueConnectionFactory");
-			mailQueue = (Queue) initialContext.lookup("jms/mailQueue");
+			queueConnectionFactory = (QueueConnectionFactory) initialContext.lookup(getProperty(session, "jmsQueueConnectionFactory", "jms/queueConnectionFactory"));
+			mailQueue = (Queue) initialContext.lookup(getProperty(session, "jmsQueue", "jms/mailQueue"));
 		} catch (NamingException e) {
 			throw new RuntimeException("Cannot create SmtpJmsTransport.", e);
 		}
+		String strb = getProperty(session, "validateFrom", "true");
+		validateFrom = Boolean.valueOf(strb);
 	}
 
 	
+	private static String getProperty(Session session, String keySufix, String defaultValue) {
+		return session.getProperties().getProperty("mail.smtpjms." + keySufix, defaultValue);
+	}
+
+
 	@Override
 	public void sendMessage(Message msg, Address[] addresses) throws MessagingException {
+		if (validateFrom && (msg.getFrom() == null || msg.getFrom().length == 0)) {
+			throw new MessagingException("Field from not set or empty for message " + msg);
+		}
 		QueueConnection queueConnection = null;
 		QueueSession queueSession = null;
 		try {
@@ -67,10 +77,10 @@ public class SmtpJmsTransport extends Transport {
 			queueSender.setDeliveryMode(DeliveryMode.PERSISTENT);
 			queueSender.send(createJmsMessage(queueSession, msg, addresses));
 		} catch(JMSException ex) {
-			throw new MessagingException("Cannot send message to JMS queue.", ex);
+			throw new MessagingException("Cannot send message " + msg + " JMS queue.", ex);
 		} finally {
-			try { queueSession.close(); } catch(JMSException jmsEx) {	logger.warning("Problem closing JMS session - " + jmsEx);	}
-			try { queueConnection.close(); } catch(JMSException jmsEx) {	logger.warning("Problem closing JMS connection - " + jmsEx);	}
+			try { queueSession.close(); } catch(JMSException jmsEx) 	{	logger.warning("Problem closing JMS session - " + jmsEx);		}
+			try { queueConnection.close(); } catch(JMSException jmsEx) 	{	logger.warning("Problem closing JMS connection - " + jmsEx);	}
 		}
 	}
 

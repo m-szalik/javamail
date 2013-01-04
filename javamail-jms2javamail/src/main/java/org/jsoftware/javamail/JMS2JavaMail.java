@@ -14,11 +14,10 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.mail.Address;
 import javax.mail.Session;
+import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
 
-@MessageDriven(
-		mappedName = "jms/mailQueue", name = "mailQueue"
-)
+@MessageDriven(mappedName = "jms/mailQueue", name = "mailQueue")
 public class JMS2JavaMail implements MessageListener {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
@@ -26,9 +25,7 @@ public class JMS2JavaMail implements MessageListener {
 	private Session session;
 
 	
-	
 	public void onMessage(Message message) {
-		logger.info("Recieved message " + message);
 		if (message instanceof BytesMessage) {
 			try {
 				BytesMessage bmsg = (BytesMessage) message;
@@ -44,10 +41,14 @@ public class JMS2JavaMail implements MessageListener {
 				ObjectInputStream ois = new ObjectInputStream(bais);
 				Address[] addresses = (Address[]) ois.readObject();
 				MimeMessage mimeMessage = new MimeMessage(session, ois);
-				session.getTransport().sendMessage(mimeMessage, addresses);
+				Transport transport = session.getTransport();
+				transport.sendMessage(mimeMessage, addresses);
 				ack(message);
+				if (logger.isLoggable(Level.FINE)) {
+					logger.log(Level.FINE, "Message " + mimeMessage.getMessageID() + " successfuly sent to destination javaMailSession using " + transport + ".");
+				}
 			} catch(Exception ex) {
-				logger.log(Level.SEVERE, "Error processing JMS message.", ex);
+				logger.log(Level.SEVERE, "Error processing JMS message - " + message + ".", ex);
 			}
 		} else {
 			logger.warning("Found message that is not BytesMessage - " + message + ", " + message.getClass());
