@@ -18,10 +18,9 @@
 	
 	<dependencies>
 	    <dependency>
-			<groupId>javax.jms</groupId>
-			<artifactId>jms</artifactId>
-			<scope>provided</scope>
-		</dependency>
+		<groupId>javax</groupId>
+		<artifactId>javaee-api</artifactId>
+	    </dependency>
 	</dependencies>
 	
 </project>
