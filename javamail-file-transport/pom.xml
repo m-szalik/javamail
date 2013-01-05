@@ -9,10 +9,11 @@
 	    <groupId>org.jsoftware</groupId>
 	    <artifactId>javamail</artifactId>
 	    <version>1.4.4</version>
+	    <relativePath>../</relativePath>
 	</parent>
 	
-	<name>JavaMail Transport for smtpfile protocol. This protocol saves messages on local file system</name>
-	<description>Saves sent mails in local filesystem.</description>
-	<url>http://maven.apache.org</url>
-
+	<url>http://jsoftware.org</url>
+	<name>JavaMail SMTP File Transport</name>
+	<description>JavaMail Transport for smtpfile protocol. This protocol saves messages on local file system.</description>
+	
 </project>

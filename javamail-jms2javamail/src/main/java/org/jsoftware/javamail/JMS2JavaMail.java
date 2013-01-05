@@ -21,7 +21,7 @@ import javax.mail.internet.MimeMessage;
 public class JMS2JavaMail implements MessageListener {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
-	@Resource(mappedName="mail/serverSession")
+	@Resource(mappedName="mail/session")
 	private Session session;
 
 	
@@ -39,13 +39,23 @@ public class JMS2JavaMail implements MessageListener {
 				} while (true);
 				ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 				ObjectInputStream ois = new ObjectInputStream(bais);
+				String protocolToUse = ois.readUTF();
 				Address[] addresses = (Address[]) ois.readObject();
 				MimeMessage mimeMessage = new MimeMessage(session, ois);
-				Transport transport = session.getTransport();
-				transport.sendMessage(mimeMessage, addresses);
+				Transport transport = session.getTransport(protocolToUse);
+				if (transport.isConnected()) {
+					transport.sendMessage(mimeMessage, addresses);
+				} else {
+					try {
+						transport.connect();
+						transport.sendMessage(mimeMessage, addresses);
+					} finally {
+						transport.close();
+					}
+				} 
 				ack(message);
 				if (logger.isLoggable(Level.FINE)) {
-					logger.log(Level.FINE, "Message " + mimeMessage.getMessageID() + " successfuly sent to destination javaMailSession using " + transport + ".");
+					logger.log(Level.FINE, "Message " + mimeMessage.getMessageID() + " successfuly sent to destination javaMailSession using " + protocolToUse + " -> " + transport + ".");
 				}
 			} catch(Exception ex) {
 				logger.log(Level.SEVERE, "Error processing JMS message - " + message + ".", ex);

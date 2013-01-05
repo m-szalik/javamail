@@ -9,12 +9,13 @@
 	    <groupId>org.jsoftware</groupId>
 		<artifactId>javamail</artifactId>
 		<version>1.4.4</version>
+		<relativePath>../</relativePath>
 	</parent>
-	
-	<name>JavaMail Transport that is saveing email into JMS queue.</name>
-	<description>JavaMail Transport that is saveing email into JMS queue. There is also MessageBean that recieves those messages and sends it into real javamial.</description>
-	<url>http://maven.apache.org</url>
 
+	<url>http://jsoftware.org</url>
+	<name>JavaMail JMS File Transport.</name>
+	<description>JavaMail Transport for smtpjms protocol. This protocol saves messages into jms queue (jndi jms/mailQueue).</description>
+	
 	
 	<dependencies>
 	    <dependency>

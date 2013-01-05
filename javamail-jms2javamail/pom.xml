@@ -9,16 +9,19 @@
 	    <groupId>org.jsoftware</groupId>
 		<artifactId>javamail</artifactId>
 		<version>1.4.4</version>
+		<relativePath>../</relativePath>
 	</parent>
 	
-	<url>http://maven.apache.org</url>
-
+	<url>http://jsoftware.org</url>
+	<name>JMS2JavaMail - Message Driven Bean.</name>
+	<description>Message Driven Bean that copies JavaMail messages from JMS to real JavaMail SMTP Transport.</description>
+	
 
 	<dependencies>
 	    <dependency>
-		<groupId>javax</groupId>
-		<artifactId>javaee-api</artifactId>
-		<scope>provided</scope>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<scope>provided</scope>
 	    </dependency>
 	</dependencies>
 	

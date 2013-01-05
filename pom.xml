@@ -6,6 +6,9 @@
 	<version>1.4.4</version>
 	<packaging>pom</packaging>
 
+	<url>http://jsoftware.org</url>
+	<name>JavaMail extensions.</name>
+
 	<dependencies>
 		<dependency>
 			<groupId>javax.mail</groupId>

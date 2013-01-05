@@ -17,6 +17,7 @@ import javax.jms.QueueSession;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.URLName;
@@ -34,6 +35,7 @@ public class SmtpJmsTransport extends Transport {
 	private final QueueConnectionFactory queueConnectionFactory;
 	private final Queue mailQueue;
 	private final boolean validateFrom;
+	private final String protocolToUse;
 	
 	public SmtpJmsTransport(Session session, URLName urlname) {
 		super(session, urlname);
@@ -44,8 +46,15 @@ public class SmtpJmsTransport extends Transport {
 		} catch (NamingException e) {
 			throw new RuntimeException("Cannot create SmtpJmsTransport.", e);
 		}
-		String strb = getProperty(session, "validateFrom", "true");
-		validateFrom = Boolean.valueOf(strb);
+		String str = getProperty(session, "validateFrom", "true");
+		validateFrom = Boolean.valueOf(str);
+		protocolToUse = getProperty(session, "dstProtocol", "smtp");
+		// Check if dstProtocol is available.
+		try {
+			session.getTransport(protocolToUse);
+		} catch (NoSuchProviderException e) {
+			throw new RuntimeException("No provider for dstProtocol (" + protocolToUse + ")", e);
+		}
 	}
 
 	
@@ -109,6 +118,7 @@ public class SmtpJmsTransport extends Transport {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
 			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeUTF(protocolToUse);
 			oos.writeObject(addresses == null ? new Address[0] : addresses);
 			msg.writeTo(oos);
 		} catch (IOException e) {
