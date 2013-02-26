@@ -6,6 +6,12 @@
 	<version>1.4.4</version>
 	<packaging>pom</packaging>
 
+	<parent>
+	    <groupId>org.jsoftware</groupId>
+	    <artifactId>jsoftware</artifactId>
+	    <version>1.5</version>
+	</parent>
+	
 	<url>http://jsoftware.org</url>
 	<name>JavaMail extensions.</name>
 
@@ -25,30 +31,6 @@
 		</dependency>	
 	</dependencies>
 
-
-	<build>
-        <plugins>
-        	<plugin>
-                   <artifactId>maven-compiler-plugin</artifactId>
-                   <version>2.0.2</version>
-                   <configuration>
-                           <source>1.5</source>
-                           <target>1.5</target>
-                   </configuration>
-        	</plugin>
-	    </plugins>
-	</build>
-
-
-	<distributionManagement>
-		<repository>
-			<id>jsLocal</id>
-			<name>myCompanyReporsitory</name>
-			<url>file:///home/maven-repo/maven-repo-public/</url>
-		</repository>
-	</distributionManagement>
-	
-	
 	<dependencyManagement>
 	    <dependencies>
 		<dependency>
@@ -65,5 +47,5 @@
 		<module>javamail-jms-transport</module>
 		<module>javamail-jms2javamail</module>
 	</modules>
-		
+
 </project>
