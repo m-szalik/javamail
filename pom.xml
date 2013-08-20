@@ -3,17 +3,17 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jsoftware</groupId>
 	<artifactId>javamail</artifactId>
-	<version>1.4.5-SNAPSHOT</version>
+	<version>1.5.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<parent>
 	    <groupId>org.jsoftware</groupId>
 	    <artifactId>jsoftware</artifactId>
-	    <version>1.5</version>
+	    <version>1.7</version>
 	</parent>
 	
 	<url>http://jsoftware.org</url>
-	<name>JavaMail extensions for javaMail 1.4.4 (jdk6)</name>
+	<name>JavaMail extensions for javaMail 1.5.0 (jdk7)</name>
 
 	<dependencies>
 		<dependency>
@@ -35,13 +35,13 @@
 		<dependency>
 		    <groupId>javax</groupId>
 		    <artifactId>javaee-api</artifactId>
-		    <version>6.0</version>
+		    <version>7.0</version>
 		    <scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>javax.mail-api</artifactId>
-			<version>1.4.4</version>
+			<version>1.5.0</version>
 			<scope>provided</scope>
 		</dependency>
 	    </dependencies>
@@ -60,11 +60,18 @@
 	</scm>
 	
 	<distributionManagement>
-                <repository>
-                        <id>jsLocal</id>
-                        <name>myCompanyReporsitory</name>
-                        <url>file:///home/maven-repo/maven-repo-public/</url>
-                </repository>
-        </distributionManagement>
+		<repository>
+			<id>jsLocal</id>
+			<name>myCompanyReporsitory</name>
+			<url>file:///home/maven-repo/maven-repo-public/</url>
+		</repository>
+	</distributionManagement>
+
+	<repositories>
+		<repository>
+			<id>jsoftware.org</id>
+			<url>http://maven.jsoftware.org</url>
+		</repository>
+	</repositories>
 	
 </project>
