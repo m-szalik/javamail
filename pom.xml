@@ -60,11 +60,11 @@
 	</scm>
 	
 	<distributionManagement>
-		<repository>
-		    <id>jsoftware.org</id>
-		    <name>JSoftware.org</name>
-		    <url>http://maven.jsoftware.org</url>
-		</repository>    
-	</distributionManagement>
+                <repository>
+                        <id>jsLocal</id>
+                        <name>myCompanyReporsitory</name>
+                        <url>file:///home/maven-repo/maven-repo-public/</url>
+                </repository>
+        </distributionManagement>
 
 </project>
