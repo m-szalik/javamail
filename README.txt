@@ -1,3 +1,6 @@
+Versions:
+	1.4.4 for jdk6
+	
 How it works:
     Application ---> JMSTransport ---> JMS mailQueue
     JMS mailQueue ---> XXXTransport
