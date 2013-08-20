@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jsoftware</groupId>
 	<artifactId>javamail-jms2javamail</artifactId>
-	<version>1.4.4</version>
+	<version>1.4.4-SNAPSHOT</version>
 	<parent>
 	    <groupId>org.jsoftware</groupId>
 		<artifactId>javamail</artifactId>
-		<version>1.4.4</version>
+		<version>1.4.4-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
 	
@@ -19,9 +19,9 @@
 
 	<dependencies>
 	    <dependency>
-			<groupId>javax</groupId>
-			<artifactId>javaee-api</artifactId>
-			<scope>provided</scope>
+		<groupId>javax</groupId>
+		<artifactId>javaee-api</artifactId>
+		<scope>provided</scope>
 	    </dependency>
 	</dependencies>
 	

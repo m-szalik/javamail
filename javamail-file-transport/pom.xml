@@ -4,11 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jsoftware</groupId>
 	<artifactId>javamail-file-transport</artifactId>
-	<version>1.4.4</version>
+	<version>1.4.4-SNAPSHOT</version>
 	<parent>
 	    <groupId>org.jsoftware</groupId>
-	    <artifactId>javamail</artifactId>
-	    <version>1.4.4</version>
+	    <version>1.4.4-SNAPSHOT</version>
 	    <relativePath>../</relativePath>
 	</parent>
 	
