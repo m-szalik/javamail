@@ -3,12 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jsoftware</groupId>
 	<artifactId>javamail-jms-transport</artifactId>
-	<version>1.4.5-SNAPSHOT</version>
+	<version>1.5.0-SNAPSHOT</version>
 	<parent>
 	    <groupId>org.jsoftware</groupId>
 		<artifactId>javamail</artifactId>
-		<version>1.4.5-SNAPSHOT</version>
-		<relativePath>../</relativePath>
+		<version>1.5.0-SNAPSHOT</version>
 	</parent>
 
 	<url>http://jsoftware.org</url>
