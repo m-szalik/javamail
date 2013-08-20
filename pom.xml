@@ -48,4 +48,17 @@
 		<module>javamail-jms2javamail</module>
 	</modules>
 
+	<scm>
+		<url>svn://jsoftware.org/grucha/javamail/trunk</url>
+		<connection>scm:svn:svn://jsoftware.org/grucha/javamail/trunk</connection>
+		<developerConnection>scm:svn:svn://jsoftware.org/grucha/javamail/trunk</developerConnection>
+	</scm>
+	
+	<distributionManagement>
+		<repository>
+		    <name>JSoftware.org</name>
+		    <url>http://maven.jsoftware.org</url>
+		</repository>    
+	</distributionManagement>
+
 </project>
