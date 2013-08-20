@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jsoftware</groupId>
 	<artifactId>javamail</artifactId>
-	<version>1.4.4</version>
+	<version>1.4.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<parent>
@@ -54,9 +54,9 @@
 	</modules>
 
 	<scm>
-		<url>svn://jsoftware.org/grucha/javamail/tags/javamail-1.4.4</url>
-		<connection>scm:svn:svn://jsoftware.org/grucha/javamail/tags/javamail-1.4.4</connection>
-		<developerConnection>scm:svn:svn://jsoftware.org/grucha/javamail/tags/javamail-1.4.4</developerConnection>
+		<url>svn://jsoftware.org/grucha/javamail/trunk</url>
+		<connection>scm:svn:svn://jsoftware.org/grucha/javamail/trunk</connection>
+		<developerConnection>scm:svn:svn://jsoftware.org/grucha/javamail/trunk</developerConnection>
 	</scm>
 	
 	<distributionManagement>
