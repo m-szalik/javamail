@@ -1,11 +1,5 @@
 package org.jsoftware.javamail;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.annotation.Resource;
 import javax.ejb.MessageDriven;
 import javax.jms.BytesMessage;
@@ -16,12 +10,17 @@ import javax.mail.Address;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @MessageDriven(mappedName = "jms/mailQueue", name = "mailQueue")
 public class JMS2JavaMail implements MessageListener {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
-	@Resource(mappedName="mail/session")
+	@Resource(mappedName="mail/Session")
 	private Session session;
 
 	
