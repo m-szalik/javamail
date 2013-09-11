@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jsoftware</groupId>
 	<artifactId>javamail-jms-transport</artifactId>
-	<version>1.5.0-SNAPSHOT</version>
+	<version>1.5.0</version>
 	<parent>
 	    <groupId>org.jsoftware</groupId>
 		<artifactId>javamail</artifactId>
-		<version>1.5.0-SNAPSHOT</version>
+		<version>1.5.0</version>
 	</parent>
 
 	<url>http://jsoftware.org</url>
@@ -17,8 +17,9 @@
 
 	<dependencies>
 	    <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
+		    <groupId>javax</groupId>
+		    <artifactId>javaee-api</artifactId>
+            <scope>provided</scope>
 	    </dependency>
 	</dependencies>
 	
