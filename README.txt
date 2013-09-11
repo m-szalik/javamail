@@ -23,6 +23,11 @@ How to install JavaMail JMS Support:
 		    mail.smtpjms.jmsQueue			        jms/mailQueue			    JMS Queue. (DO NOT CHANGE IT)
 		    mail.smtpjms.validateFrom		        true				        Check if mail field FROM is set.
 		    mail.smtpjms.dstProtocol		        smtp				        Destination javaMail protocol. Used for real messages sending.
+Smtp options:
+            mail.smtp.host                          localhost                   Host for SMTP transport
+           	mail.smtp.port                          25                          Port for SMTP transport
+            mail.smtp.auth                          false                       Auth for SMTP transport
+            mail.smtp.starttls.enable               -                           Auth option for SMTP transport
 
 	    ii) SMTP or other (this will be used for real messages sending)
 		Protocol: (see configuration for JMS Transport)		default: smtp
