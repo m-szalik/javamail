@@ -12,7 +12,7 @@
 	</parent>
 	
 	<url>http://jsoftware.org</url>
-	<name>JavaMail SMTP File Transport</name>
+	<name>JavaMail SMTP File Transport.</name>
 	<description>JavaMail Transport for smtpfile protocol. This protocol saves messages on local file system.</description>
 	
 </project>
