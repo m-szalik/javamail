@@ -1,29 +1,17 @@
 package org.jsoftware.javamail;
 
 
+import javax.jms.*;
+import javax.mail.*;
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.jms.BytesMessage;
-import javax.jms.DeliveryMode;
-import javax.jms.JMSException;
-import javax.jms.Queue;
-import javax.jms.QueueConnection;
-import javax.jms.QueueConnectionFactory;
-import javax.jms.QueueSender;
-import javax.jms.QueueSession;
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.URLName;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 /**
  * Sends {@link Message}s to JMS {@link Queue}.
@@ -59,14 +47,14 @@ public class SmtpJmsTransport extends Transport {
 	}
 
 	
-	private static String getProperty(Session session, String keySufix, String defaultValue) {
-		return session.getProperties().getProperty("mail.smtpjms." + keySufix, defaultValue);
+	private static String getProperty(Session session, String keySuffix, String defaultValue) {
+		return session.getProperties().getProperty("mail.smtpjms." + keySuffix, defaultValue);
 	}
 
 
 	@Override
 	public void sendMessage(Message msg, Address[] addresses) throws MessagingException {
-        if (validateFrom && (msg.getFrom() == null || msg.getFrom().length == 0)) {
+		if (validateFrom && (msg.getFrom() == null || msg.getFrom().length == 0)) {
 			throw new MessagingException("Field from not set or empty for message " + msg);
 		}
 		QueueConnection queueConnection = null;
@@ -97,9 +85,13 @@ public class SmtpJmsTransport extends Transport {
 		}
 	}
 
-	
+    @Override
+    protected boolean protocolConnect(String host, int port, String user, String password) throws MessagingException {
+        return true;
+    }
 
-	private javax.jms.Message createJmsMessage(QueueSession queueSession, Message msg, Address[] addresses) throws JMSException, MessagingException {
+
+    private javax.jms.Message createJmsMessage(QueueSession queueSession, Message msg, Address[] addresses) throws JMSException, MessagingException {
 		int prio = 5;
 		String[] str = msg.getHeader(X_SEND_PRIORITY);
 		if (str != null && str.length > 0) {
