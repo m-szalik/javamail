@@ -12,7 +12,7 @@ How to install JavaMail JMS Support:
 3) Create JNDI resources:
     a) JNDI: jms/queueConnectionFactory		Type: javax.jms.QueueConnectionFactory
     b) JNDI: jms/mailQueue			Type: javax.jms.Queue			(this is where messages will be stored)
-    c) JNDI: mail/Session			Type: javax.mail.Sessios        (only one is required)
+    c) JNDI: mail/Session			Type: javax.mail.Session        (only one is required)
 	Configure two transports in mail/Session:
 	    i) JMS Transport (as default)
 		Protocol: smtpjms
