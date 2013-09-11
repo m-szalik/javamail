@@ -54,7 +54,7 @@ public class JMS2JavaMail implements MessageListener {
 				} 
 				ack(message);
 				if (logger.isLoggable(Level.FINE)) {
-					logger.log(Level.FINE, "Message " + mimeMessage.getMessageID() + " successfuly sent to destination javaMailSession using " + protocolToUse + " -> " + transport + ".");
+					logger.log(Level.FINE, "Message " + mimeMessage.getMessageID() + " (" + mimeMessage.getMessageNumber() + ") successfully sent to destination javaMailSession using " + protocolToUse + " -> " + transport + ".");
 				}
 			} catch(Exception ex) {
 				logger.log(Level.SEVERE, "Error processing JMS message - " + message + ".", ex);

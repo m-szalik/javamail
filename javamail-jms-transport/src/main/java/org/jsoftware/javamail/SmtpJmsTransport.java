@@ -10,6 +10,7 @@ import javax.naming.NamingException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -53,7 +54,7 @@ public class SmtpJmsTransport extends Transport {
 
 	@Override
 	public void sendMessage(Message msg, Address[] addresses) throws MessagingException {
-		if (validateFrom && (msg.getFrom() == null || msg.getFrom().length == 0)) {
+        if (validateFrom && (msg.getFrom() == null || msg.getFrom().length == 0)) {
 			throw new MessagingException("Field from not set or empty for message " + msg);
 		}
 		QueueConnection queueConnection = null;
@@ -73,7 +74,10 @@ public class SmtpJmsTransport extends Transport {
 			queueConnection.start();
 			queueSender.setDeliveryMode(DeliveryMode.PERSISTENT);
 			queueSender.send(createJmsMessage(queueSession, msg, addresses));
-		} catch(JMSException ex) {
+            if (logger.isLoggable(Level.FINE)) {
+                logger.log(Level.FINE, "Message " + msg.getMessageNumber() + " sent to JMS queue.");
+            }
+        } catch(JMSException ex) {
 			throw new MessagingException("Cannot send message " + msg + " JMS queue.", ex);
 		} finally {
 			try { queueSession.close(); } catch(JMSException jmsEx) 	{	logger.warning("Problem closing JMS session - " + jmsEx);		}
