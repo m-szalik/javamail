@@ -1,70 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.jsoftware</groupId>
-	<artifactId>javamail</artifactId>
-	<version>1.4.4</version>
-	<packaging>pom</packaging>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.jsoftware</groupId>
+    <artifactId>javamail</artifactId>
+    <version>1.4.4</version>
+    <packaging>pom</packaging>
 
-	<parent>
-	    <groupId>org.jsoftware</groupId>
-	    <artifactId>jsoftware</artifactId>
-	    <version>1.5</version>
-	</parent>
-	
-	<url>http://jsoftware.org</url>
-	<name>JavaMail extensions for javaMail 1.4.4 (jdk6)</name>
+    <parent>
+        <groupId>org.jsoftware</groupId>
+        <artifactId>jsoftware</artifactId>
+        <version>1.6</version>
+    </parent>
 
-	<dependencies>
-		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>javax.mail-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-			<scope>test</scope>
-		</dependency>	
-	</dependencies>
+    <url>http://jsoftware.org</url>
+    <name>JavaMail extensions for javaMail 1.4.4 (jdk6)</name>
 
-	<dependencyManagement>
-	    <dependencies>
-		<dependency>
-		    <groupId>javax</groupId>
-		    <artifactId>javaee-api</artifactId>
-		    <version>6.0</version>
-		    <scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>javax.mail-api</artifactId>
-			<version>1.4.4</version>
-			<scope>provided</scope>
-		</dependency>
-	    </dependencies>
-	</dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
-	<modules>
-		<module>javamail-file-transport</module>
-		<module>javamail-jms-transport</module>
-		<module>javamail-jms2javamail</module>
-	</modules>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-	<scm>
-		<url>svn://jsoftware.org/grucha/javamail/tags/javamail-1.4.4</url>
-		<connection>scm:svn:svn://jsoftware.org/grucha/javamail/tags/javamail-1.4.4</connection>
-		<developerConnection>scm:svn:svn://jsoftware.org/grucha/javamail/tags/javamail-1.4.4</developerConnection>
-	</scm>
-	
-	<distributionManagement>
-                <repository>
-                        <id>jsLocal</id>
-                        <name>myCompanyReporsitory</name>
-                        <url>file:///home/maven-repo/maven-repo-public/</url>
-                </repository>
-        </distributionManagement>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>javax</groupId>
+                <artifactId>javaee-api</artifactId>
+                <version>6.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>javax.mail-api</artifactId>
+                <version>1.4.4</version>
+                <scope>provided</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>jsoftware</id>
+            <url>http://maven.jsoftware.org/</url>
+        </repository>
+    </repositories>
+
+    <modules>
+        <module>javamail-file-transport</module>
+        <module>javamail-jms-transport</module>
+        <module>javamail-jms2javamail</module>
+    </modules>
+
+    <scm>
+        <url>svn://jsoftware.org/grucha/javamail/tags/javamail-1.4.4</url>
+        <connection>scm:svn:svn://jsoftware.org/grucha/javamail/tags/javamail-1.4.4</connection>
+        <developerConnection>scm:svn:svn://jsoftware.org/grucha/javamail/tags/javamail-1.4.4</developerConnection>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>jsLocal</id>
+            <name>myCompanyReporsitory</name>
+            <url>file:///home/maven-repo/maven-repo-public/</url>
+        </repository>
+    </distributionManagement>
+
 
 </project>
