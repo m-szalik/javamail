@@ -1,16 +1,10 @@
 package org.jsoftware.javamail;
 
+import javax.mail.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.UUID;
-
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.URLName;
 
 /**
  * {@link Transport} that saves messages to file using diferent format writters
@@ -35,6 +29,7 @@ public class SmtpFileTransport extends Transport {
 	@Override
 	public void sendMessage(Message message, Address[] addresses) throws MessagingException {
 		UUID uuid = UUID.randomUUID();
+        validate(message, addresses);
 		File file = new File(dir, uuid + ".msg");
 		try {
 			FileOutputStream fw = new FileOutputStream(file);
@@ -48,8 +43,7 @@ public class SmtpFileTransport extends Transport {
 		}
 	}
 
-
-	@Override
+    @Override
 	public void connect(String host, int port, String user, String password) throws MessagingException {
 		// do nothing
 	}
@@ -65,4 +59,15 @@ public class SmtpFileTransport extends Transport {
 	public synchronized void close() throws MessagingException {
 		// do nothing
 	}
+
+
+    private void validate(Message message, Address[] addresses) throws MessagingException {
+        if (message.getFrom() == null || message.getFrom().length == 0) {
+            throw new MessagingException("No FROM address set!");
+        }
+        if (message.getAllRecipients().length + addresses.length == 0) {
+            throw new MessagingException("No RECIPIENTS set!");
+        }
+    }
+
 }
