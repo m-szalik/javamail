@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 /**
- * {@link Transport} that saves messages to file using diferent format writters
+ * {@link Transport} that saves messages to file using different format witters
  * @author szalik
  */
 public class SmtpFileTransport extends Transport {

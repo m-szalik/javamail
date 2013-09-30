@@ -95,19 +95,19 @@ public class SmtpJmsTransport extends Transport {
 
 
     private javax.jms.Message createJmsMessage(QueueSession queueSession, Message msg, Address[] addresses) throws JMSException, MessagingException {
-		int prio = 5;
+		int priority = 5;    // we use 5 as normal JMS priority
 		String[] str = msg.getHeader(X_SEND_PRIORITY);
 		if (str != null && str.length > 0) {
 			msg.removeHeader(X_SEND_PRIORITY);
 			try {
-				if("low".equals(str[0])) {
-					prio = 1;
-				} else if ("high".equals(str[0])) {
-					prio = 8;
-				} else {
-					prio = Integer.parseInt(str[0]);
-					prio = Math.max(prio, 0);
-					prio = Math.min(prio, 9);
+				if("low".equalsIgnoreCase(str[0])) {
+					priority = 1;
+				} else if ("high".equalsIgnoreCase(str[0])) {
+					priority = 8;
+				} else if (! "normal".equalsIgnoreCase(str[0])) {
+                    priority = Integer.parseInt(str[0]);
+					priority = Math.max(priority, 0);
+					priority = Math.min(priority, 9);
 				}
 			} catch(NumberFormatException nfe) {
 				logger.warning("Invalid value for " + X_SEND_PRIORITY + " - " + str[0]);
@@ -126,7 +126,7 @@ public class SmtpJmsTransport extends Transport {
 			throw mex;
 		}
 		jms.writeBytes(baos.toByteArray());
-		jms.setJMSPriority(prio);
+		jms.setJMSPriority(priority);
 		return jms;
 	}
 }
