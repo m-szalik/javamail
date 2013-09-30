@@ -65,7 +65,7 @@ public class SmtpFileTransport extends Transport {
         if (message.getFrom() == null || message.getFrom().length == 0) {
             throw new MessagingException("No FROM address set!");
         }
-        if (message.getAllRecipients().length + addresses.length == 0) {
+        if (addresses.length == 0) {
             throw new MessagingException("No RECIPIENTS set!");
         }
     }

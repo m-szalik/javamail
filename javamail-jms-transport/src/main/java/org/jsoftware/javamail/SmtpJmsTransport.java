@@ -57,7 +57,7 @@ public class SmtpJmsTransport extends Transport {
 		if (validateFrom && (msg.getFrom() == null || msg.getFrom().length == 0)) {
 			throw new MessagingException("Field FROM not set or empty!");
 		}
-        if (msg.getAllRecipients().length + addresses.length == 0) {
+        if (addresses.length == 0) {
             throw new MessagingException("No RECIPIENTS set!");
         }
 		QueueConnection queueConnection = null;
