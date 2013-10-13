@@ -1,19 +1,13 @@
 package org.jsoftware.javamail;
 
+import javax.mail.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
-import javax.mail.Address;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.URLName;
-
 /**
- * {@link Transport} that saves messages to file using diferent format writters
+ * {@link Transport} that saves messages to file using different format writers
  * @author szalik
  */
 public class SmtpFileTransport extends Transport {
@@ -37,11 +31,14 @@ public class SmtpFileTransport extends Transport {
 		UUID uuid = UUID.randomUUID();
 		File file = new File(dir, uuid + ".msg");
 		try {
-			FileOutputStream fw = new FileOutputStream(file);
+			FileOutputStream fw = null;
 			try {
+                fw = new FileOutputStream(file);
 				message.writeTo(fw);
 			} finally {
-				fw.close();
+                if (fw != null) {
+				    fw.close();
+                }
 			}
 		} catch (IOException e) {
 			throw new MessagingException("Failed to write file " + file.getAbsolutePath(), e);
