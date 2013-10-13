@@ -83,10 +83,23 @@ public class SmtpJmsTransport extends Transport {
         } catch(JMSException ex) {
 			throw new MessagingException("Cannot send message " + msg + " JMS queue.", ex);
 		} finally {
-			try { queueSession.close(); } catch(JMSException jmsEx) 	{	logger.warning("Problem closing JMS session - " + jmsEx);		}
-			try { queueConnection.close(); } catch(JMSException jmsEx) 	{	logger.warning("Problem closing JMS connection - " + jmsEx);	}
+			try {
+                if (queueSession != null) {
+                    queueSession.close();
+                }
+            } catch(JMSException jmsEx)	{
+                logger.warning("Problem closing JMS session - " + jmsEx);
+            }
+			try {
+                if (queueConnection != null) {
+                    queueConnection.close();
+                }
+            } catch(JMSException jmsEx)	{
+                logger.warning("Problem closing JMS connection - " + jmsEx);
+            }
 		}
 	}
+
 
     @Override
     protected boolean protocolConnect(String host, int port, String user, String password) throws MessagingException {
