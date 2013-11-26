@@ -27,12 +27,12 @@ public class JMS2JavaMail implements MessageListener {
 	public void onMessage(Message message) {
 		if (message instanceof BytesMessage) {
 			try {
-				BytesMessage bmsg = (BytesMessage) message;
+				BytesMessage bMsg = (BytesMessage) message;
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				byte[] buf = new byte[32];
 				int r;
 				do {
-					r = bmsg.readBytes(buf);
+					r = bMsg.readBytes(buf);
 					if (r < 0) break;
 					baos.write(buf, 0, r);
 				} while (true);
