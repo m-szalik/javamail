@@ -63,10 +63,11 @@
     </modules>
 
     <scm>
-        <url>svn://jsoftware.org/grucha/javamail/trunk</url>
-        <connection>scm:svn:svn://jsoftware.org/grucha/javamail/trunk</connection>
-        <developerConnection>scm:svn:svn://jsoftware.org/grucha/javamail/trunk</developerConnection>
+        <url>https://github.com/m-szalik/javamail.git</url>
+        <connection>scm:git:https://github.com/m-szalik/javamail.git</connection>
+        <developerConnection>scm:git:https://github.com/m-szalik/javamail.git</developerConnection>
     </scm>
+
 
     <distributionManagement>
         <repository>
