@@ -1,4 +1,4 @@
-Versions:
+Version info:
 	1.5.0 for jdk7
 	
 How it works:
