@@ -9,7 +9,7 @@
 	<parent>
 	    <groupId>org.jsoftware</groupId>
 	    <artifactId>jsoftware</artifactId>
-	    <version>1.7</version>
+	    <version>1.7.1</version>
 	</parent>
 	
 	<url>http://jsoftware.org</url>
@@ -56,13 +56,6 @@
         </dependencies>
     </dependencyManagement>
 
-    <repositories>
-        <repository>
-            <id>jsoftware</id>
-            <url>http://maven.jsoftware.org/</url>
-        </repository>
-    </repositories>
-
     <modules>
         <module>javamail-file-transport</module>
         <module>javamail-jms-transport</module>
@@ -76,13 +69,10 @@
         <developerConnection>scm:git:https://github.com/m-szalik/javamail.git</developerConnection>
     </scm>
 
+    <issueManagement>
+        <url>https://github.com/m-szalik/javamail/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
 
-    <distributionManagement>
-        <repository>
-            <id>jsLocal</id>
-            <name>myCompanyRepository</name>
-            <url>file:///home/maven-repo/maven-repo-public/</url>
-        </repository>
-    </distributionManagement>
 
 </project>
