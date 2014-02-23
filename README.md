@@ -18,5 +18,9 @@ It can be deployed on application server (as default mailSession) and it's compl
 #### Configuration
 For configuration examples see [docs/README.txt](./docs/README.txt)
 
+#### More info on Wiki
+https://github.com/m-szalik/javamail/wiki
+
+
 ### License
 Apache License 2.0
