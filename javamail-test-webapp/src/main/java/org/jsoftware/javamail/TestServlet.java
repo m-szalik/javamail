@@ -4,7 +4,6 @@ package org.jsoftware.javamail;
 import javax.annotation.Resource;
 import javax.mail.Message;
 import javax.mail.Session;
-import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletException;
@@ -34,13 +33,17 @@ public class TestServlet extends HttpServlet {
         }
         try {
             Date now = new Date();
-            message.setFrom(new InternetAddress(mailSession.getProperty("mail.from")));
-            InternetAddress[] address = {new InternetAddress(to)};
+            String from = mailSession.getProperty("mail.from");
+            if (from == null || from.length() == 0) {
+                from = "test@test.com";
+            }
+            message.setFrom(new InternetAddress(from));
+            InternetAddress[] address = { new InternetAddress(to) };
             message.setRecipients(Message.RecipientType.TO, address);
             message.setSubject("JavaMail Test - " + now);
             message.setSentDate(now);
             message.setText("This is test message sent by org.jsoftware.javamail:javamail-test-webapp.");
-            Transport.send(message);
+            mailSession.getTransport().sendMessage(message, address);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new ServletException("Error sending mail!", ex);

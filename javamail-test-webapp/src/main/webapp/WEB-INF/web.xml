@@ -13,7 +13,7 @@
 
 	<servlet-mapping>
 		<servlet-name>TestServlet</servlet-name>
-		<url-pattern>/</url-pattern>
+		<url-pattern>/send</url-pattern>
 	</servlet-mapping>
 
 	<welcome-file-list>

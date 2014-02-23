@@ -6,7 +6,7 @@
     </head>
 
     <body>
-        <form method="post">
+        <form method="post" action="<%= request.getContextPath() %>/send">
             Send email to: <input type="email" name="to"/>
             <br/>
             <input type="submit" value="send test message"/>
