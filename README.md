@@ -16,7 +16,7 @@ It can be deployed on application server (as default mailSession) and it's compl
 * javamail-test-webapp = testing/example web application
 
 #### Configuration
-For configuration examples see [README.txt](./README.txt)
+For configuration examples see [docs/README.txt](./docs/README.txt)
 
 ### License
 Apache License 2.0
