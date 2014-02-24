@@ -1,6 +1,7 @@
 package org.jsoftware.javamail;
 
-import java.util.Properties;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import javax.mail.Address;
 import javax.mail.MessagingException;
@@ -8,9 +9,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
-import org.junit.Ignore;
-import org.junit.Test;
+import java.util.Properties;
 
 @Ignore
 public class TransportTest {
