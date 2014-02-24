@@ -1,11 +1,13 @@
 package org.jsoftware.javamail;
 
 
-import javax.annotation.Resource;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,7 +17,7 @@ import java.util.Date;
 
 public class TestServlet extends HttpServlet {
 
-	@Resource(lookup = "mail/Session")
+    /** On tomcat @Resource loads global mailSession but should load those defined in context.xml */
 	private transient Session mailSession;
 
 
@@ -52,4 +54,15 @@ public class TestServlet extends HttpServlet {
     }
 
 
+    @Override
+    public void init(ServletConfig servletConfig) throws ServletException {
+        super.init(servletConfig);
+        try {
+            Context initCtx = new InitialContext();
+            Context envCtx = (Context) initCtx.lookup("java:comp/env");
+            mailSession = (Session) envCtx.lookup("mail/Session");
+        } catch (Exception ex) {
+            throw new ServletException(ex);
+        }
+    }
 }

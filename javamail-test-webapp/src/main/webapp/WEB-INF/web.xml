@@ -24,7 +24,6 @@
         <res-ref-name>mail/Session</res-ref-name>
         <res-type>javax.mail.Session</res-type>
         <res-auth>Container</res-auth>
-        <res-sharing-scope>Unshareable</res-sharing-scope>
     </resource-ref>
 
 
