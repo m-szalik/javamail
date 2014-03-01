@@ -42,7 +42,9 @@ public abstract class AbstractFileTransport extends AbstractDevTransport {
                     sb.append('.').append(getFilenameExtension());
                     file = new File(dir, sb.toString());
                 } while (file.exists());
-                file.createNewFile();
+                if (! file.createNewFile()) {
+                    throw new IOException("Cannot create file " + file.getAbsolutePath());
+                }
             }
             FileOutputStream fw = null;
 			try {
