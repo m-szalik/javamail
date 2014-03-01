@@ -10,6 +10,7 @@ import java.util.*;
 /**
  * {@link javax.mail.Transport} Saves mail as text - only headers and text part of multi-part is saved
  * @author szalik
+ * @since 1.5.1
  */
 public class FileTxtTransport extends AbstractFileTransport {
     private final static List<String> HEADERS_ORDER = Arrays.asList("Date", "From", "To", "Message-ID", "Subject"); // than others
