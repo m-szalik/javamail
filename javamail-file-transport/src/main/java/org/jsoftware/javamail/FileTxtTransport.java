@@ -13,11 +13,13 @@ import java.util.*;
  * @since 1.5.1
  */
 public class FileTxtTransport extends AbstractFileTransport {
-    private final static List<String> HEADERS_ORDER = Arrays.asList("Date", "From", "To", "Message-ID", "Subject"); // than others
+    private final static List<String> HEADERS_ORDER = Arrays.asList("Date", "From", "To", "Subject", "Message-ID"); // than others
+
 
 	public FileTxtTransport(Session session, URLName urlname) {
 		super(session, urlname);
 	}
+
 
     @Override
     protected void writeMessage(Message message, Address[] addresses, OutputStream os) throws IOException, MessagingException {
@@ -42,12 +44,7 @@ public class FileTxtTransport extends AbstractFileTransport {
             Object content = message.getContent();
             String body = null;
             if (content instanceof Multipart) {
-                HashMap<String,String> bodies = new HashMap<String,String>();
-                Multipart mp = (Multipart) content;
-                for(int i = 0; i < mp.getCount(); i++) {
-                    checkPart(bodies, mp.getBodyPart(i));
-                }
-                for(Map.Entry<String,String> me : bodies.entrySet()) {
+                for(Map.Entry<String,String> me : extractTextParts((Multipart) content).entrySet()) {
                     String key = me.getKey().toLowerCase();
                     if (key.startsWith("text/plain")) {
                         body = me.getValue();
@@ -60,6 +57,7 @@ public class FileTxtTransport extends AbstractFileTransport {
             } else {
                 body = content.toString();
             }
+
             if (body == null) {
                 writer.append("UNABLE TO FIND BODY (text nor html)!");
             } else {
@@ -74,6 +72,7 @@ public class FileTxtTransport extends AbstractFileTransport {
     }
 
 
+
     private boolean skipHeader(String header) {
         for(String h : HEADERS_ORDER) {
             if (h.equalsIgnoreCase(header)) {
@@ -84,30 +83,22 @@ public class FileTxtTransport extends AbstractFileTransport {
     }
 
 
-    private static void checkPart(HashMap<String, String> bodies, Part part) throws IOException, MessagingException {
-        Object content = part.getContent();
-        if (content instanceof CharSequence) {
-            bodies.put(part.getContentType(), content.toString());
-        } else if (content instanceof Multipart) {
-            Multipart mp = (Multipart) content;
-            for(int i = 0; i < mp.getCount(); i++) {
-                checkPart(bodies, mp.getBodyPart(i));
-            }
-        }
-    }
-
 
     private static void addHeader(Message message, String header, Writer writer) throws MessagingException, IOException {
-        for(String hv : message.getHeader(header)) {
-            if (hv != null && hv.trim().length() > 0) {
-                writer.append(header).append(": ").append(hv).append('\n');
+        String[] headers = message.getHeader(header);
+        if (headers != null) {
+            for(String hv : headers) {
+                if (hv != null && hv.trim().length() > 0) {
+                    writer.append(header).append(": ").append(hv).append('\n');
+                }
             }
         }
     }
 
 
     @Override
-    protected String generateFilename(Message message, Address[] addresses) {
-        return UUID.randomUUID().toString() + ".txt";
+    protected String getFilenameExtension() {
+        return "txt";
     }
+
 }

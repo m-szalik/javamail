@@ -12,9 +12,12 @@ import java.util.logging.Logger;
 public class NopTransport extends AbstractDevTransport {
     private final Logger logger = Logger.getLogger(getClass().getName());
 
+
     public NopTransport(Session session, URLName urlname) {
         super(session, urlname);
     }
+
+
 
     @Override
     public void sendMessage(Message msg, Address[] addresses) throws MessagingException {

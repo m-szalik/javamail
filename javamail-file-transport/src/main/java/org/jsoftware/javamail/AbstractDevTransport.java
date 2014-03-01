@@ -1,6 +1,9 @@
 package org.jsoftware.javamail;
 
 import javax.mail.*;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * {@link javax.mail.Transport} for developers
@@ -36,12 +39,36 @@ public abstract class AbstractDevTransport extends Transport {
      * @param addresses
      * @throws MessagingException
      */
-    protected void validate(Message message, Address[] addresses) throws MessagingException {
+    static void validate(Message message, Address[] addresses) throws MessagingException {
         if (message.getFrom() == null || message.getFrom().length == 0) {
             throw new MessagingException("No FROM address set!");
         }
         if (addresses.length == 0) {
             throw new MessagingException("No RECIPIENTS set!");
+        }
+    }
+
+
+
+    static Map<String,String> extractTextParts(Multipart multipart) throws MessagingException, IOException {
+        HashMap<String,String> bodies = new HashMap<String,String>();
+        for(int i = 0; i < multipart.getCount(); i++) {
+            checkPart(bodies, multipart.getBodyPart(i));
+        }
+        return bodies;
+    }
+
+
+
+    private static void checkPart(HashMap<String, String> bodies, Part part) throws IOException, MessagingException {
+        Object content = part.getContent();
+        if (content instanceof CharSequence) {
+            bodies.put(part.getContentType(), content.toString());
+        } else if (content instanceof Multipart) {
+            Multipart mp = (Multipart) content;
+            for(int i = 0; i < mp.getCount(); i++) {
+                checkPart(bodies, mp.getBodyPart(i));
+            }
         }
     }
 

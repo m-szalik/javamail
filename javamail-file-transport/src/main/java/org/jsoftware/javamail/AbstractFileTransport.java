@@ -13,7 +13,6 @@ import java.io.OutputStream;
 public abstract class AbstractFileTransport extends AbstractDevTransport {
 	private final File dir;
 
-
 	public AbstractFileTransport(Session session, URLName urlname) {
 		super(session, urlname);
 		String s = session.getProperties().getProperty("mail.files.path", ".");
@@ -29,9 +28,23 @@ public abstract class AbstractFileTransport extends AbstractDevTransport {
 	@Override
 	public void sendMessage(Message message, Address[] addresses) throws MessagingException {
 		validate(message, addresses);
-        File file = new File(dir, generateFilename(message, addresses));
-		try {
-			FileOutputStream fw = null;
+        File file = null;
+        int suffix = -1;
+        String base = Long.toString(System.currentTimeMillis(), 32);
+        try {
+            synchronized (this) {
+                do {
+                    suffix++;
+                    StringBuilder sb = new StringBuilder(base);
+                    if (suffix > 0) {
+                        sb.append('-').append(suffix);
+                    }
+                    sb.append('.').append(getFilenameExtension());
+                    file = new File(dir, sb.toString());
+                } while (file.exists());
+                file.createNewFile();
+            }
+            FileOutputStream fw = null;
 			try {
                 fw = new FileOutputStream(file);
 				writeMessage(message, addresses, fw);
@@ -41,9 +54,10 @@ public abstract class AbstractFileTransport extends AbstractDevTransport {
                 }
 			}
 		} catch (IOException e) {
-			throw new MessagingException("Failed to write file " + file.getAbsolutePath(), e);
+			throw new MessagingException("Failed to write file " + (file != null ? file.getAbsolutePath() : ""), e);
 		}
 	}
+
 
     /**
      * Write message
@@ -54,12 +68,10 @@ public abstract class AbstractFileTransport extends AbstractDevTransport {
      */
     protected abstract void writeMessage(Message message, Address[] addresses, OutputStream os) throws IOException, MessagingException;
 
+
     /**
-     * Generate filename for a message
-     * @param message message
-     * @param addresses addresses
-     * @return filename
+     * @return filename extension
      */
-    protected abstract String generateFilename(Message message, Address[] addresses);
+    protected abstract String getFilenameExtension();
 
 }
