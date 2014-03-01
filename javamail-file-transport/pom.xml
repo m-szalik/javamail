@@ -12,5 +12,14 @@
 	<url>http://jsoftware.org</url>
 	<name>JavaMail SMTP File Transport.</name>
 	<description>JavaMail Transport for smtpfile protocol. This protocol saves messages on local file system.</description>
-	
+
+
+    <dependencies>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>${javamail.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

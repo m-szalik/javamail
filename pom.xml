@@ -11,6 +11,11 @@
 	    <artifactId>jsoftware</artifactId>
 	    <version>1.7.1</version>
 	</parent>
+
+    <properties>
+        <javamail.version>1.5.0</javamail.version>
+    </properties>
+
 	
 	<url>http://jsoftware.org</url>
 	<name>JavaMail extensions for javaMail 1.5.0 (jdk7).</name>
@@ -50,7 +55,7 @@
             <dependency>
                 <groupId>javax.mail</groupId>
                 <artifactId>javax.mail-api</artifactId>
-                <version>1.5.0</version>
+                <version>${javamail.version}</version>
                 <scope>provided</scope>
             </dependency>
         </dependencies>
