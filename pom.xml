@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jsoftware</groupId>
 	<artifactId>javamail</artifactId>
-    <version>1.5.1</version>
+    <version>1.5.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<parent>
@@ -72,7 +72,7 @@
         <url>https://github.com/m-szalik/javamail.git</url>
         <connection>scm:git:https://github.com/m-szalik/javamail.git</connection>
         <developerConnection>scm:git:https://github.com/m-szalik/javamail.git</developerConnection>
-      <tag>javamail-1.5.1</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <issueManagement>
