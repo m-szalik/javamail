@@ -1,2 +1,6 @@
-# JavaMail SMTP provider that saves mail in files on local Filesystem
-protocol=smtpfile; type=transport; class=org.jsoftware.javamail.SmtpFileTransport; vendor=Jsoftware.org;
+# JavaMail SMTP provider that saves mail in files on local filesystem
+protocol=filemsg;  type=transport; class=org.jsoftware.javamail.FileMsgTransport; vendor=Jsoftware.org;
+protocol=filembox; type=transport; class=org.jsoftware.javamail.FileMsgTransport; vendor=Jsoftware.org;
+protocol=filetxt;  type=transport; class=org.jsoftware.javamail.FileTxtTransport; vendor=Jsoftware.org;
+protocol=nop;      type=transport; class=org.jsoftware.javamail.NopTransport; vendor=Jsoftware.org;
+protocol=NOP;      type=transport; class=org.jsoftware.javamail.NopTransport; vendor=Jsoftware.org;
