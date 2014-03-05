@@ -49,7 +49,13 @@ public abstract class AbstractDevTransport extends Transport {
     }
 
 
-
+    /**
+     * Extract parts from Multipart message.
+     * @param multipart
+     * @return map of part contentType -> part content
+     * @throws MessagingException
+     * @throws IOException
+     */
     static Map<String,String> extractTextParts(Multipart multipart) throws MessagingException, IOException {
         HashMap<String,String> bodies = new HashMap<String,String>();
         for(int i = 0; i < multipart.getCount(); i++) {
