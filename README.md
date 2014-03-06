@@ -26,7 +26,7 @@ For configuration examples see [docs/README.txt](./docs/README.txt)
 Apache License 2.0
 
 ### Problems and questions
-In case of problems or questions contact me by [creating an issue](https://github.com/m-szalik/dbpatch-maven-plugin/issues/new) on GitHub.
+In case of problems or questions contact me by [creating an issue](https://github.com/m-szalik/javamail/issues/new) on GitHub.
 
 ### More info on Wiki
 https://github.com/m-szalik/javamail/wiki
