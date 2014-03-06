@@ -22,9 +22,11 @@ You can choose transport one of:
 #### Configuration
 For configuration examples see [docs/README.txt](./docs/README.txt)
 
-#### More info on Wiki
-https://github.com/m-szalik/javamail/wiki
-
-
 ### License
 Apache License 2.0
+
+### Problems and questions
+In case of problems or questions contact me by [creating an issue](https://github.com/m-szalik/dbpatch-maven-plugin/issues/new) on GitHub.
+
+### More info on Wiki
+https://github.com/m-szalik/javamail/wiki
