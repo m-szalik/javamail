@@ -1,0 +1,13 @@
+Date: Fri, 7 Mar 2014 02:00:49 +0100 (CET)
+From: test@test.com
+To: somebody@somewhere.com
+Subject: JavaMail Test - Fri Mar 07 02:00:49 CET 2014
+
+
+Dear Visitor,
+
+A few months ago I discovered great javaMail extension.
+Visit https://github.com/m-szalik/javamail/wiki for more details.
+
+    Kind Regards
+    Developer
