@@ -22,7 +22,7 @@ You can choose transport one of:
 #### Configuration
 For configuration examples see [docs/README.txt](./docs/README.txt)
 
-#### Example
+#### Demo 
 It takes **only 5 steps** to see how it works.
 You can download a webapp application, wich works with jetty to see how it works.
 1. Clone project `git clone https://github.com/m-szalik/javamail.git`
@@ -31,9 +31,11 @@ You can download a webapp application, wich works with jetty to see how it works
 1. Go to [http://localhost:8080/webapp](http://localhost:8080/webapp) and click to send an email
 1. Use your favourite text editor to see en email in **target/messages** directory
 
-#### More info on Wiki
-https://github.com/m-szalik/javamail/wiki
-
-
 ### License
 Apache License 2.0
+
+### Problems and questions
+In case of problems or questions contact me by [creating an issue](https://github.com/m-szalik/javamail/issues/new) on GitHub.
+
+### More info on Wiki
+https://github.com/m-szalik/javamail/wiki

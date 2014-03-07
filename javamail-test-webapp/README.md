@@ -1,5 +1,5 @@
-javaMail example application
-============================
+javaMail demo application
+=========================
 
 ### Run with maven
 1. Run it with maven and jetty `mvn jetty:run`
