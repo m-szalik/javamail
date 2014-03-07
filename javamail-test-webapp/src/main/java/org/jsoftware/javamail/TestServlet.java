@@ -15,9 +15,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 
+/**
+ * Example servlet for sending emails via javax.mail.Session.
+ */
 public class TestServlet extends HttpServlet {
 
-    /** On tomcat @Resource loads global mailSession but should load those defined in context.xml */
+    /** On Tomcat application server - @Resource loads global mailSession but should load those defined in context.xml */
 	private transient Session mailSession;
 
 
@@ -26,34 +29,47 @@ public class TestServlet extends HttpServlet {
         httpServletRequest.getRequestDispatcher("/index.jsp").forward(httpServletRequest, response);
     }
 
+
+    /**
+     * Sand example email
+     */
     @Override
     protected void doPost(HttpServletRequest httpServletRequest, HttpServletResponse response) throws ServletException, IOException {
-        MimeMessage message = new MimeMessage(mailSession);
-        String to = httpServletRequest.getParameter("to");
-        if (to == null || to.length() == 0) {
+        String toEmail = httpServletRequest.getParameter("to");
+        String body = httpServletRequest.getParameter("body");
+        if (toEmail == null || toEmail.length() == 0) {
             throw new ServletException("No \"to\" parameter!");
         }
+        if (body == null || body.length() == 0) {
+            body = "No body";
+        }
+
         try {
             Date now = new Date();
             String from = mailSession.getProperty("mail.from");
             if (from == null || from.length() == 0) {
                 from = "test@test.com";
             }
+            MimeMessage message = new MimeMessage(mailSession);
             message.setFrom(new InternetAddress(from));
-            InternetAddress[] address = { new InternetAddress(to) };
+            InternetAddress[] address = { new InternetAddress(toEmail) };
             message.setRecipients(Message.RecipientType.TO, address);
-            message.setSubject("JavaMail Test - " + now);
+            message.setSubject("JavaMail test at " + now);
             message.setSentDate(now);
-            message.setText("This is test message sent by org.jsoftware.javamail:javamail-test-webapp.");
+            message.setText(body.trim());
             mailSession.getTransport().sendMessage(message, address);
+            httpServletRequest.setAttribute("sent", Boolean.TRUE);
         } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new ServletException("Error sending mail!", ex);
+            httpServletRequest.setAttribute("sent", Boolean.FALSE);
+            throw new ServletException("Error sending example e-mail!", ex);
         }
         doGet(httpServletRequest, response);
     }
 
 
+    /**
+     * Get Session from JNDI
+     */
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);

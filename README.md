@@ -22,6 +22,15 @@ You can choose transport one of:
 #### Configuration
 For configuration examples see [docs/README.txt](./docs/README.txt)
 
+#### Example
+It takes **only 5 steps** to see how it works.
+You can download a webapp application, wich works with jetty to see how it works.
+1. Clone project `git clone https://github.com/m-szalik/javamail.git`
+1. Enter javamail-test-webapp directory `cd javamail/javamail-test-webapp/`
+1. Run it with maven and jetty `mvn jetty:run`
+1. Go to <a href="http://localhost:8080/webapp">http://localhost:8080/webapp</a> and click to send an email
+1. Use your favourite text editor to see en email in **target/messages** directory
+
 #### More info on Wiki
 https://github.com/m-szalik/javamail/wiki
 

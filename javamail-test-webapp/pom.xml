@@ -12,16 +12,45 @@
     <url>http://jsoftware.org</url>
     <name>JMS2JavaMail - Testing webapp.</name>
 
-
-    <build>
-        <finalName>javamail-test-webapp</finalName>
-    </build>
-
     <dependencies>
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
+    <build>
+        <finalName>javamail-test-webapp</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.0.3.v20130506</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jsoftware</groupId>
+                        <artifactId>javamail-file-transport</artifactId>
+                        <version>1.5.2-SNAPSHOT</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.mail</groupId>
+                        <artifactId>javax.mail-api</artifactId>
+                        <version>${javamail.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.sun.mail</groupId>
+                        <artifactId>javax.mail</artifactId>
+                        <version>${javamail.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <webApp>
+                        <jettyEnvXml>jetty/env.xml</jettyEnvXml>
+                        <contextPath>/webapp</contextPath>
+                    </webApp>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
