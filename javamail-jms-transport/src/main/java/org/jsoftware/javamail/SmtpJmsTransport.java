@@ -23,6 +23,7 @@ import java.util.logging.Logger;
  * </p>
  * @see javax.jms.MessageProducer#setTimeToLive(long)
  * @see javax.jms.Message#setJMSPriority(int)
+ * @see #createJmsMessage(javax.jms.QueueSession, javax.mail.Message, javax.mail.Address[])
  * @author szalik
  */
 public class SmtpJmsTransport extends Transport {
@@ -116,7 +117,15 @@ public class SmtpJmsTransport extends Transport {
         return true;
     }
 
-
+    /**
+     * Create javax.jms.Message for javax.mail.Message
+     * JMS message contains:
+     * <ul>
+     *  <li>protocolToUse (String) - destination / final Transport</li>
+     *  <li>addresses (array javax.mail.Address) - who to send to</li>
+     *  <li>message (object javax.mail.Message) - message content</li>
+     * </ul>
+     */
     private javax.jms.Message createJmsMessage(QueueSession queueSession, Message msg, Address[] addresses) throws JMSException, MessagingException {
 		int priority = 5;    // we use 5 as normal JMS priority
 		String[] str = msg.getHeader(X_SEND_PRIORITY);

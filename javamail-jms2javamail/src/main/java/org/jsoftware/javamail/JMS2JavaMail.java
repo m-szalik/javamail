@@ -16,6 +16,11 @@ import java.io.ObjectInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Get javax.mail.Message (bytes) from JMS queue and send it using required Transport.
+ * <p>A required protocol is a part of JMS message</p>
+ * See SmtpJmsTransport class
+ */
 @MessageDriven(mappedName = "jms/mailQueue", name = "mailQueue")
 public class JMS2JavaMail implements MessageListener {
 	private final Logger logger = Logger.getLogger(getClass().getName());
