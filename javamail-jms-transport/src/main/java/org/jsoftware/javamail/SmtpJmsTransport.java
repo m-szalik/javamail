@@ -33,6 +33,7 @@ public class SmtpJmsTransport extends Transport {
 	private final Queue mailQueue;
 	private final boolean validateFrom;
 	private final String protocolToUse;
+    private final int jmsDeliveryMode;
 	
 	public SmtpJmsTransport(Session session, URLName urlname) {
 		super(session, urlname);
@@ -52,6 +53,7 @@ public class SmtpJmsTransport extends Transport {
 		} catch (NoSuchProviderException e) {
 			throw new RuntimeException("No provider for dstProtocol (" + protocolToUse + ")", e);
 		}
+        this.jmsDeliveryMode = Integer.parseInt(getProperty(session, "jmsDeliveryMode", Integer.toString(DeliveryMode.PERSISTENT)));
 	}
 
 	
@@ -83,7 +85,7 @@ public class SmtpJmsTransport extends Transport {
 				}
 			}
 			queueConnection.start();
-			queueSender.setDeliveryMode(DeliveryMode.PERSISTENT);
+			queueSender.setDeliveryMode(jmsDeliveryMode);
 			queueSender.send(createJmsMessage(queueSession, msg, addresses));
             if (logger.isLoggable(Level.FINE)) {
                 logger.log(Level.FINE, "Message " + msg.getMessageNumber() + " sent to JMS queue.");
