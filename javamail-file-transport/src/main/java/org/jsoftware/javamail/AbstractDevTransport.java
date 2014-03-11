@@ -17,19 +17,19 @@ public abstract class AbstractDevTransport extends Transport {
 
     @Override
 	public void connect(String host, int port, String user, String password) throws MessagingException {
-		// do nothing
+		// do nothing because we do not need to connect anywhere
 	}
 
 
 	@Override
 	public boolean isConnected() {
-		return true;
+		return true; //it's always connected to local file system :)
 	}
 
 
 	@Override
 	public void close() throws MessagingException {
-		// do nothing
+		// do nothing, we didn't have to connect so we also do not have to disconnect.
 	}
 
 
@@ -65,7 +65,9 @@ public abstract class AbstractDevTransport extends Transport {
     }
 
 
-
+    /**
+     * Recursive find body parts and save them to HashMap
+     */
     private static void checkPart(HashMap<String, String> bodies, Part part) throws IOException, MessagingException {
         Object content = part.getContent();
         if (content instanceof CharSequence) {

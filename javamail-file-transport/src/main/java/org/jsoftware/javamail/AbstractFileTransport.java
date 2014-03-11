@@ -13,6 +13,7 @@ import java.io.OutputStream;
 public abstract class AbstractFileTransport extends AbstractDevTransport {
 	private final File dir;
 
+
 	public AbstractFileTransport(Session session, URLName urlname) {
 		super(session, urlname);
 		String s = session.getProperties().getProperty("mail.files.path", ".");
@@ -72,7 +73,7 @@ public abstract class AbstractFileTransport extends AbstractDevTransport {
 
 
     /**
-     * @return filename extension
+     * @return filename extension (file where mail is saved to)
      */
     protected abstract String getFilenameExtension();
 
