@@ -9,9 +9,9 @@ import java.util.Map;
  * {@link javax.mail.Transport} for developers
  * @author szalik
  */
-public abstract class AbstractDevTransport extends Transport {
+abstract class AbstractDevTransport extends Transport {
 
-	public AbstractDevTransport(Session session, URLName urlname) {
+	AbstractDevTransport(Session session, URLName urlname) {
 		super(session, urlname);
 	}
 
@@ -39,27 +39,46 @@ public abstract class AbstractDevTransport extends Transport {
      * @param addresses
      * @throws MessagingException
      */
-    static void validate(Message message, Address[] addresses) throws MessagingException {
+    static void validateAndPrepare(Message message, Address[] addresses) throws MessagingException {
         if (message.getFrom() == null || message.getFrom().length == 0) {
             throw new MessagingException("No FROM address set!");
         }
         if (addresses.length == 0) {
             throw new MessagingException("No RECIPIENTS set!");
         }
+        Address[] messageAddresses = message.getAllRecipients();
+        if (messageAddresses == null) {
+            for(Address address : addresses) {
+                message.addRecipient(Message.RecipientType.TO, address);
+            }
+        } else {
+            out:
+            for(Address address : addresses) {
+                for(Address a : messageAddresses) {
+                    if (a == null) {
+                        continue;
+                    }
+                    if (a.equals(address)) {
+                        continue out;
+                    }
+                }
+                message.addRecipient(Message.RecipientType.TO, address);
+            }
+        }
     }
 
 
     /**
-     * Extract parts from Multipart message.
-     * @param multipart
+     * Extract parts from Multi-part message.
+     * @param multiPart multi-part to visit
      * @return map of part contentType -> part content
      * @throws MessagingException
      * @throws IOException
      */
-    static Map<String,String> extractTextParts(Multipart multipart) throws MessagingException, IOException {
+    static Map<String,String> extractTextParts(Multipart multiPart) throws MessagingException, IOException {
         HashMap<String,String> bodies = new HashMap<String,String>();
-        for(int i = 0; i < multipart.getCount(); i++) {
-            checkPart(bodies, multipart.getBodyPart(i));
+        for(int i = 0; i < multiPart.getCount(); i++) {
+            checkPart(bodies, multiPart.getBodyPart(i));
         }
         return bodies;
     }

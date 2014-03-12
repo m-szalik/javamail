@@ -33,14 +33,14 @@ public class TransportTest {
 	@Test
 	public void transportTxtTest() throws MessagingException, IOException, NoSuchAlgorithmException {
 		AbstractFileTransport transport = (AbstractFileTransport) session.getTransport("filetxt");
-        transport.writeMessage(generateMessage(), toAddress, outputStream);
+        transport.writeMessage(generateMessage(), outputStream);
         org.junit.Assert.assertEquals("4c7fb32ade5f1e860d9f8234b1ba8d5a", md5sumFromOutput());
 	}
 
     @Test
     public void transportMsgTest() throws MessagingException, IOException, NoSuchAlgorithmException {
         AbstractFileTransport transport = (AbstractFileTransport) session.getTransport("filemsg");
-        transport.writeMessage(generateMessage(), toAddress, outputStream);
+        transport.writeMessage(generateMessage(), outputStream);
         org.junit.Assert.assertEquals("789f256c33750a89b804a6c667e85d35", md5sumFromOutput());
     }
 
@@ -77,6 +77,7 @@ public class TransportTest {
         for(String l : content.split("\n")) {
             if (! l.startsWith("Date:") && ! l.startsWith("Message-ID:") && ! l.contains("Part")) {
                 m.update(l.getBytes());
+                System.out.println(l);
             }
         }
         byte[] digest = m.digest();

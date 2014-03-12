@@ -21,6 +21,7 @@ public class NopTransport extends AbstractDevTransport {
 
     @Override
     public void sendMessage(Message msg, Address[] addresses) throws MessagingException {
+        validateAndPrepare(msg, addresses);
         logger.info("Message {subject=" + msg.getSubject() + ", to=" + Arrays.asList(addresses) + "}");
     }
 

@@ -16,7 +16,7 @@ public class FileMsgTransport extends AbstractFileTransport {
 
 
     @Override
-    protected void writeMessage(Message message, Address[] addresses, OutputStream os) throws IOException, MessagingException {
+    protected void writeMessage(Message message, OutputStream os) throws IOException, MessagingException {
         message.writeTo(os);
     }
 

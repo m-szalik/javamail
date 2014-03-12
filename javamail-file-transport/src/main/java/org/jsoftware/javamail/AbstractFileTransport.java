@@ -10,11 +10,11 @@ import java.io.OutputStream;
  * {@link javax.mail.Transport} that saves messages to file using different format writers
  * @author szalik
  */
-public abstract class AbstractFileTransport extends AbstractDevTransport {
+abstract class AbstractFileTransport extends AbstractDevTransport {
 	private final File dir;
 
 
-	public AbstractFileTransport(Session session, URLName urlname) {
+	AbstractFileTransport(Session session, URLName urlname) {
 		super(session, urlname);
 		String s = session.getProperties().getProperty("mail.files.path", ".");
 		dir = new File(s);
@@ -28,7 +28,7 @@ public abstract class AbstractFileTransport extends AbstractDevTransport {
 
 	@Override
 	public void sendMessage(Message message, Address[] addresses) throws MessagingException {
-		validate(message, addresses);
+		validateAndPrepare(message, addresses);
         File file = null;
         int suffix = -1;
         String base = Long.toString(System.currentTimeMillis(), 32);
@@ -50,7 +50,7 @@ public abstract class AbstractFileTransport extends AbstractDevTransport {
             FileOutputStream fw = null;
 			try {
                 fw = new FileOutputStream(file);
-				writeMessage(message, addresses, fw);
+				writeMessage(message, fw);
 			} finally {
                 if (fw != null) {
 				    fw.close();
@@ -69,7 +69,7 @@ public abstract class AbstractFileTransport extends AbstractDevTransport {
      * @throws IOException
      * @throws MessagingException
      */
-    protected abstract void writeMessage(Message message, Address[] addresses, OutputStream os) throws IOException, MessagingException;
+    protected abstract void writeMessage(Message message, OutputStream os) throws IOException, MessagingException;
 
 
     /**

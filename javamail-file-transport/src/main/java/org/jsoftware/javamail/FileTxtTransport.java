@@ -22,7 +22,7 @@ public class FileTxtTransport extends AbstractFileTransport {
 
 
     @Override
-    protected void writeMessage(Message message, Address[] addresses, OutputStream os) throws IOException, MessagingException {
+    protected void writeMessage(Message message, OutputStream os) throws IOException, MessagingException {
         OutputStreamWriter writer = null;
         try {
             writer = new OutputStreamWriter(os, "UTF-8");
