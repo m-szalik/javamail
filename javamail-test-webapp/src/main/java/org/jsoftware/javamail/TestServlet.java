@@ -22,6 +22,7 @@ import java.util.Date;
  * Example servlet for sending emails via javax.mail.Session.
  */
 public class TestServlet extends HttpServlet {
+    private static final long serialVersionUID = -8672192004708473059L;
 
     /** On Tomcat application server - @Resource loads global mailSession but should load those defined in context.xml */
 	private transient Session mailSession;
