@@ -2,9 +2,12 @@ package org.jsoftware.javamail;
 
 
 import javax.mail.Message;
+import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.ServletConfig;
@@ -56,7 +59,14 @@ public class TestServlet extends HttpServlet {
             message.setRecipients(Message.RecipientType.TO, address);
             message.setSubject("JavaMail test at " + now);
             message.setSentDate(now);
-            message.setText(body.trim());
+            MimeBodyPart textPart = new MimeBodyPart();
+            textPart.setText("Body's text (text)", "UTF-8");
+            MimeBodyPart htmlPart = new MimeBodyPart();
+            htmlPart.setContent("<p>Body's text <strong>(html)</strong></p>", "text/html; charset=UTF-8");
+            Multipart multiPart = new MimeMultipart("alternative");
+            multiPart.addBodyPart(textPart);
+            multiPart.addBodyPart(htmlPart);
+            message.setContent(multiPart);
             mailSession.getTransport().sendMessage(message, address);
             httpServletRequest.setAttribute("sent", Boolean.TRUE);
         } catch (Exception ex) {
