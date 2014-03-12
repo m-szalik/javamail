@@ -35,8 +35,8 @@ abstract class AbstractDevTransport extends Transport {
 
     /**
      * Validate FROM and RECIPIENTS
-     * @param message
-     * @param addresses
+     * @param message message to validate
+     * @param addresses addresses to be added into message if not duplicated
      * @throws MessagingException
      */
     static void validateAndPrepare(Message message, Address[] addresses) throws MessagingException {
