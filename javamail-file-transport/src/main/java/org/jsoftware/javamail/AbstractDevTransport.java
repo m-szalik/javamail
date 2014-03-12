@@ -1,6 +1,7 @@
 package org.jsoftware.javamail;
 
 import javax.mail.*;
+import javax.mail.event.ConnectionEvent;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +19,7 @@ abstract class AbstractDevTransport extends Transport {
     @Override
 	public void connect(String host, int port, String user, String password) throws MessagingException {
 		// do nothing because we do not need to connect anywhere
+        notifyConnectionListeners(ConnectionEvent.OPENED);
 	}
 
 
@@ -30,6 +32,7 @@ abstract class AbstractDevTransport extends Transport {
 	@Override
 	public void close() throws MessagingException {
 		// do nothing, we didn't have to connect so we also do not have to disconnect.
+        notifyConnectionListeners(ConnectionEvent.CLOSED);
 	}
 
 

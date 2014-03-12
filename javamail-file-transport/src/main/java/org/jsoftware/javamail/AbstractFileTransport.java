@@ -1,6 +1,7 @@
 package org.jsoftware.javamail;
 
 import javax.mail.*;
+import javax.mail.event.TransportEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.io.OutputStream;
  * @author szalik
  */
 abstract class AbstractFileTransport extends AbstractDevTransport {
+    private final static Address[] ADDRESSES_EMPTY = new Address[0];
 	private final File dir;
 
 
@@ -51,12 +53,14 @@ abstract class AbstractFileTransport extends AbstractDevTransport {
 			try {
                 fw = new FileOutputStream(file);
 				writeMessage(message, fw);
+                notifyTransportListeners(TransportEvent.MESSAGE_DELIVERED, message.getAllRecipients(), ADDRESSES_EMPTY, ADDRESSES_EMPTY, message);
 			} finally {
                 if (fw != null) {
 				    fw.close();
                 }
 			}
 		} catch (IOException e) {
+            notifyTransportListeners(TransportEvent.MESSAGE_DELIVERED, ADDRESSES_EMPTY, message.getAllRecipients(), ADDRESSES_EMPTY, message);
 			throw new MessagingException("Failed to write file " + (file.getAbsolutePath()), e);
 		}
 	}

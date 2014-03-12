@@ -5,6 +5,7 @@ import javax.jms.*;
 import javax.mail.*;
 import javax.mail.Message;
 import javax.mail.Session;
+import javax.mail.event.TransportEvent;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.io.ByteArrayOutputStream;
@@ -27,6 +28,7 @@ import java.util.logging.Logger;
  * @author szalik
  */
 public class SmtpJmsTransport extends Transport {
+    private final static Address[] ADDRESSES_EMPTY = new Address[0];
 	private static final String X_SEND_PRIORITY = "X-Send-priority";
 	private static final String X_SEND_EXPIRE = "X-Send-expire";
 	private final Logger logger = Logger.getLogger(getClass().getName());
@@ -91,7 +93,9 @@ public class SmtpJmsTransport extends Transport {
             if (logger.isLoggable(Level.FINE)) {
                 logger.log(Level.FINE, "Message " + msg.getMessageNumber() + " sent to JMS queue.");
             }
+            notifyTransportListeners(TransportEvent.MESSAGE_DELIVERED, msg.getAllRecipients(), ADDRESSES_EMPTY, ADDRESSES_EMPTY, msg);
         } catch(JMSException ex) {
+            notifyTransportListeners(TransportEvent.MESSAGE_DELIVERED, ADDRESSES_EMPTY, msg.getAllRecipients(), ADDRESSES_EMPTY, msg);
 			throw new MessagingException("Cannot send message " + msg + " JMS queue.", ex);
 		} finally {
 			try {
