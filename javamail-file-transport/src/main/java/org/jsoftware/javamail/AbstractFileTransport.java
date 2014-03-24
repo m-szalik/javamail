@@ -13,16 +13,16 @@ import java.io.OutputStream;
  */
 abstract class AbstractFileTransport extends AbstractDevTransport {
     private final static Address[] ADDRESSES_EMPTY = new Address[0];
-	private final File dir;
+	private final File directory;
 
 
 	AbstractFileTransport(Session session, URLName urlname) {
 		super(session, urlname);
 		String s = session.getProperties().getProperty("mail.files.path", ".");
-		dir = new File(s);
-		if (! dir.exists()) {
-			if (! dir.mkdirs()) {
-				throw new IllegalArgumentException("Unable to create output directory " + dir.getAbsolutePath());
+		directory = new File(s);
+		if (! directory.exists()) {
+			if (! directory.mkdirs()) {
+				throw new IllegalArgumentException("Unable to create output directory " + directory.getAbsolutePath());
 			}
 		}
 	}
@@ -32,10 +32,10 @@ abstract class AbstractFileTransport extends AbstractDevTransport {
 	public void sendMessage(Message message, Address[] addresses) throws MessagingException {
 		validateAndPrepare(message, addresses);
         File file = null;
-        int suffix = -1;
         String base = Long.toString(System.currentTimeMillis(), 32);
         try {
             synchronized (this) {
+                int suffix = -1;
                 do {
                     suffix++;
                     StringBuilder sb = new StringBuilder(base);
@@ -43,7 +43,7 @@ abstract class AbstractFileTransport extends AbstractDevTransport {
                         sb.append('-').append(suffix);
                     }
                     sb.append('.').append(getFilenameExtension());
-                    file = new File(dir, sb.toString());
+                    file = new File(directory, sb.toString());
                 } while (file.exists());
                 if (! file.createNewFile()) {
                     throw new IOException("Cannot create file " + file.getAbsolutePath());

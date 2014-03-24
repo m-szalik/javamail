@@ -24,7 +24,7 @@ For configuration examples see [docs/README.txt](./docs/README.txt)
 
 #### Demo 
 It takes **only 5 steps** to see how it works.
-You can download a webapp application, wich works with jetty to see how it works.
+You can download a webapp application, which works with jetty to see how it works.
  1. Clone project `git clone https://github.com/m-szalik/javamail.git`
  1. Enter javamail-test-webapp directory `cd javamail/javamail-test-webapp/`
  1. Run it with maven and jetty `mvn jetty:run`

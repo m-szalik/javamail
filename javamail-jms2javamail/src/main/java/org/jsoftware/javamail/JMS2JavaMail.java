@@ -38,7 +38,9 @@ public class JMS2JavaMail implements MessageListener {
 				int r;
 				do {
 					r = bMsg.readBytes(buf);
-					if (r < 0) break;
+					if (r < 0) {
+                        break;
+                    }
 					baos.write(buf, 0, r);
 				} while (true);
 				ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());

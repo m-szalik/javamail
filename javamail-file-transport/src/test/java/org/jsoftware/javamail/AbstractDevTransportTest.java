@@ -10,6 +10,7 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -22,7 +23,7 @@ public class AbstractDevTransportTest {
     @Before
     public void setup() throws MessagingException, IOException {
         Properties properties = new Properties();
-        properties.put("mail.files.path", "target/output");
+        properties.put("mail.files.path", "target" + File.separatorChar + "output");
         Session session = Session.getDefaultInstance(properties);
         message = new MimeMessage(session);
         message.setFrom("Test <test@jsoftware.org>");
