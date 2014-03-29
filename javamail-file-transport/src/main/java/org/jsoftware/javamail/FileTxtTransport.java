@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
 
 /**
  * {@link javax.mail.Transport} Saves mail as text - only headers and text part of multi-part is saved
@@ -34,7 +37,7 @@ public class FileTxtTransport extends AbstractFileTransport {
             Enumeration<?> en = message.getAllHeaders();
             while (en.hasMoreElements()) {
                 String header = ((Header) en.nextElement()).getName();
-                if (skipHeader(header)) {
+                if (isSkipHeader(header)) {
                     continue;
                 }
                 addHeader(message, header, writer);
@@ -73,7 +76,7 @@ public class FileTxtTransport extends AbstractFileTransport {
 
 
 
-    private boolean skipHeader(String header) {
+    private boolean isSkipHeader(String header) {
         for(String h : HEADERS_ORDER) {
             if (h.equalsIgnoreCase(header)) {
                 return true;

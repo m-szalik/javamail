@@ -96,7 +96,7 @@ public class SmtpJmsTransport extends Transport {
             notifyTransportListeners(TransportEvent.MESSAGE_DELIVERED, msg.getAllRecipients(), ADDRESSES_EMPTY, ADDRESSES_EMPTY, msg);
         } catch(JMSException ex) {
             notifyTransportListeners(TransportEvent.MESSAGE_DELIVERED, ADDRESSES_EMPTY, msg.getAllRecipients(), ADDRESSES_EMPTY, msg);
-			throw new MessagingException("Cannot send message " + msg + " JMS queue.", ex);
+			throw new MessagingException("Cannot send message " + msg.toString() + " JMS queue.", ex);
 		} finally {
 			try {
                 if (queueSession != null) {
@@ -180,9 +180,7 @@ public class SmtpJmsTransport extends Transport {
 			oos.writeObject(addresses == null ? new Address[0] : addresses);
 			msg.writeTo(oos);
 		} catch (IOException e) {
-			MessagingException mex = new MessagingException();
-			mex.initCause(e);
-			throw mex;
+			throw new MessagingException("Could not send JMS message with mail content for Message-ID:" + msg.getHeader("Message-ID"), e);
 		}
 		jms.writeBytes(baos.toByteArray());
         if (priority >= 0) {

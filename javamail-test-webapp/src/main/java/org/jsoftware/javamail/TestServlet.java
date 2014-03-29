@@ -45,9 +45,8 @@ public class TestServlet extends HttpServlet {
             throw new ServletException("No \"to\" parameter!");
         }
         if (body == null || body.length() == 0) {
-            body = "No body";
+            body = "No body!";
         }
-
         try {
             Date now = new Date();
             String from = mailSession.getProperty("mail.from");
@@ -61,9 +60,9 @@ public class TestServlet extends HttpServlet {
             message.setSubject("JavaMail test at " + now);
             message.setSentDate(now);
             MimeBodyPart textPart = new MimeBodyPart();
-            textPart.setText("Body's text (text)", "UTF-8");
+            textPart.setText("Body's text (text)\n\n" + body, "UTF-8");
             MimeBodyPart htmlPart = new MimeBodyPart();
-            htmlPart.setContent("<p>Body's text <strong>(html)</strong></p>", "text/html; charset=UTF-8");
+            htmlPart.setContent("<p>Body's text <strong>(html)</strong></p><p>" + body.replace("\n", "<br/>")+"</p>", "text/html; charset=UTF-8");
             Multipart multiPart = new MimeMultipart("alternative");
             multiPart.addBodyPart(textPart);
             multiPart.addBodyPart(htmlPart);
