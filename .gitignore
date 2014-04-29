@@ -1,4 +1,22 @@
+# Java artifacts
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
+
+
+# Eclipse
+.project
+.classpath
+.settings/**
+
+
+# IntelliJ
 .idea/**
 *.iml
+
+
+# Maven
 target/**
 **/target
