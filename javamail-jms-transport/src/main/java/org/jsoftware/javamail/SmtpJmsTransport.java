@@ -90,8 +90,8 @@ public class SmtpJmsTransport extends Transport {
 			queueConnection.start();
 			queueSender.setDeliveryMode(jmsDeliveryMode);
 			queueSender.send(createJmsMessage(queueSession, msg, addresses));
-            if (logger.isLoggable(Level.FINE)) {
-                logger.log(Level.FINE, "Message " + msg.getMessageNumber() + " sent to JMS queue.");
+            if (logger.isLoggable(Level.INFO)) {
+                logger.log(Level.INFO, "Message " + msg.getMessageNumber() + " sent to JMS queue.");
             }
             notifyTransportListeners(TransportEvent.MESSAGE_DELIVERED, msg.getAllRecipients(), ADDRESSES_EMPTY, ADDRESSES_EMPTY, msg);
         } catch(JMSException ex) {
