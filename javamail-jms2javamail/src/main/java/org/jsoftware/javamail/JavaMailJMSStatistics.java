@@ -8,10 +8,7 @@ import javax.mail.Address;
 import javax.mail.Header;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.management.MBeanServer;
-import javax.management.Notification;
-import javax.management.NotificationBroadcasterSupport;
-import javax.management.ObjectName;
+import javax.management.*;
 import javax.management.openmbean.*;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -26,7 +23,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Singleton(name = "JavaMailJMSStatisticsLocal")
 @Startup
-public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implements JavaMailJMSStatisticsLocal, JavaMailJMSStatisticsMXBean {
+public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implements JavaMailJMSStatisticsLocal, DynamicMBean {
+    private static final MBeanInfo M_BEAN_INFO;
     private static final CompositeType ROW_HEADER_TYPE, ROW_ADDR_TYPE, MAIL_INFO_TYPE;
     private static final TabularType TAB_ADDR_TYPE, TAB_HEADER_TYPE;
     private MBeanServer platformMBeanServer;
@@ -53,6 +51,20 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
                     new String[]{"messageId", "date", "subject", "toAddresses", "headers", "errorDescription"},
                     new String[]{"Message ID", "Sent date", "Message subject", "Table of addresses", "Message headers", "Error description if any"},
                     new OpenType[]{SimpleType.STRING, SimpleType.DATE, SimpleType.STRING, TAB_ADDR_TYPE, TAB_HEADER_TYPE, SimpleType.STRING}
+            );
+
+
+            M_BEAN_INFO = new MBeanInfo(JavaMailJMSStatistics.class.getName(), "JavaMailJMS statistics",
+                    new MBeanAttributeInfo[] {
+                            new OpenMBeanAttributeInfoSupport("statisticsCollectionStartDate", "Start date", SimpleType.DATE, true, false, false),
+                            new OpenMBeanAttributeInfoSupport("lastSuccessfulMailInfo", "Last successful message send", MAIL_INFO_TYPE, true, false, false),
+                            new OpenMBeanAttributeInfoSupport("lastFailureMailInfo", "Last unsuccessful message send", MAIL_INFO_TYPE, true, false, false),
+                            new OpenMBeanAttributeInfoSupport("countSuccessful", "Successful messages counter", SimpleType.LONG, true, false, false),
+                            new OpenMBeanAttributeInfoSupport("countFailure", "Unsuccessful messages counter", SimpleType.LONG, true, false, false)
+                    },
+                    new MBeanConstructorInfo[0],
+                    new MBeanOperationInfo[] { new OpenMBeanOperationInfoSupport("reset", "Reset statistics", new OpenMBeanParameterInfo[0], SimpleType.DATE, MBeanOperationInfo.ACTION)},
+                    new MBeanNotificationInfo[] { new MBeanNotificationInfo(new String[]{"JavaMail-Send-Success", "JavaMail-Send-Failure"}, "mail-events", "Info about emails that has been sent.") }
             );
         } catch (OpenDataException e) {
             throw new RuntimeException("Cannot create openTypes", e);
@@ -88,7 +100,6 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
         sendNotification(maa);
     }
 
-
     public void onFailure(MimeMessage mimeMessage, Address[] addresses, Exception ex) {
         MessageAndAddresses maa = new MessageAndAddresses(mimeMessage, addresses, ex);
         failureCounter.incrementAndGet();
@@ -96,42 +107,13 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
         sendNotification(maa);
     }
 
-
-    @Override
-    public Date getStatisticsCollectionStartDate() {
-        return startDate;
-    }
-
-    @Override
-    public CompositeData getLastSentMailInfo() {
-        return convert(lastSuccessMessage);
-    }
-
-    @Override
-    public CompositeData getLastFailureMailInfo() {
-        CompositeData cd = convert(lastFailMessage);
-        return cd;
-    }
-
-    @Override
-    public long getEmailsSentSuccessCounter() {
-        return successCounter.get();
-    }
-
-    @Override
-    public long getEmailsSentFailureCounter() {
-        return failureCounter.get();
-    }
-
-    @Override
-    public void reset() {
+    private void reset() {
         startDate = new Date();
         lastFailMessage = null;
         lastSuccessMessage = null;
         successCounter.set(0);
         failureCounter.set(0);
     }
-
 
     private void sendNotification(MessageAndAddresses maa) {
         try {
@@ -184,10 +166,78 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
             throw new RuntimeException(e);
         } catch (MessagingException e) {
             throw new RuntimeException(e);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            throw e;
         }
+    }
+
+    @Override
+    public AttributeList getAttributes(String[] attributeNames) {
+        AttributeList resultList = new AttributeList();
+        if (attributeNames.length == 0) {
+            return resultList;
+        }
+        for (int i = 0; i < attributeNames.length; i++) {
+            try {
+                Object value = getAttribute(attributeNames[i]);
+                resultList.add(new Attribute(attributeNames[i], value));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return resultList;
+    }
+
+    @Override
+    public Object getAttribute(String attribute) throws AttributeNotFoundException, MBeanException, ReflectionException {
+        if ("statisticsCollectionStartDate".equalsIgnoreCase(attribute)) {
+            return startDate;
+        }
+        if ("lastSuccessfulMailInfo".equalsIgnoreCase(attribute)) {
+            return convert(lastSuccessMessage);
+        }
+        if ("lastFailureMailInfo".equalsIgnoreCase(attribute)) {
+            return convert(lastFailMessage);
+        }
+        if ("countSuccessful".equalsIgnoreCase(attribute)) {
+            return successCounter.get();
+        }
+        if ("countFailure".equalsIgnoreCase(attribute)) {
+            return failureCounter.get();
+        }
+        throw new AttributeNotFoundException("Attribute " + attribute + " not found");
+    }
+
+    @Override
+    public void setAttribute(Attribute attribute) throws AttributeNotFoundException, InvalidAttributeValueException, MBeanException, ReflectionException {
+        throw new InvalidAttributeValueException("Attribute " + attribute + " is read-only.");
+    }
+
+    @Override
+    public AttributeList setAttributes(AttributeList attributes) {
+        for(Attribute attribute : attributes.asList()) {
+            try {
+                setAttribute(attribute);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return attributes;
+    }
+
+
+
+
+    @Override
+    public Object invoke(String actionName, Object[] params, String[] signature) throws MBeanException, ReflectionException {
+        if ("reset".equalsIgnoreCase(actionName)) {
+            reset();
+            return startDate;
+        }
+        return null;
+    }
+
+    @Override
+    public MBeanInfo getMBeanInfo() {
+        return M_BEAN_INFO;
     }
 }
 
