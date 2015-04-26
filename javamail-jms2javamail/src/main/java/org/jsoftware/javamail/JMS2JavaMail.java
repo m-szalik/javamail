@@ -1,12 +1,14 @@
 package org.jsoftware.javamail;
 
 import javax.annotation.Resource;
+import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.mail.Address;
+import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
@@ -24,17 +26,21 @@ import java.util.logging.Logger;
 @MessageDriven(mappedName = "jms/mailQueue", name = "mailQueue")
 public class JMS2JavaMail implements MessageListener {
 	private final Logger logger = Logger.getLogger(getClass().getName());
-	
+
+    /** Mail session to be used to send a message */
 	@Resource(mappedName="mail/Session")
 	private Session session;
 
-	
+    @EJB
+    private JavaMailJMSStatisticsLocal javaMailJMSStatisticsLocal;
+
+
 	public void onMessage(Message message) {
 		if (message instanceof BytesMessage) {
 			try {
 				BytesMessage bMsg = (BytesMessage) message;
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				byte[] buf = new byte[32];
+				byte[] buf = new byte[512];
 				int r;
 				do {
 					r = bMsg.readBytes(buf);
@@ -48,21 +54,27 @@ public class JMS2JavaMail implements MessageListener {
 				String protocolToUse = ois.readUTF();
 				Address[] addresses = (Address[]) ois.readObject();
 				MimeMessage mimeMessage = new MimeMessage(session, ois);
-				Transport transport = session.getTransport(protocolToUse);
-				if (transport.isConnected()) {
-					transport.sendMessage(mimeMessage, addresses);
-				} else {
-					try {
-						transport.connect();
-						transport.sendMessage(mimeMessage, addresses);
-					} finally {
-						transport.close();
-					}
-				} 
-				ack(message);
-				if (logger.isLoggable(Level.INFO)) {
-					logger.log(Level.INFO, "Message " + mimeMessage.getMessageID() + " (" + mimeMessage.getMessageNumber() + ") successfully sent to destination javaMailSession using " + protocolToUse + " -> " + transport + ".");
-				}
+                try {
+                    Transport transport = session.getTransport(protocolToUse);
+                    if (transport.isConnected()) {
+                        transport.sendMessage(mimeMessage, addresses);
+                    } else {
+                        try {
+                            transport.connect();
+                            transport.sendMessage(mimeMessage, addresses);
+                        } finally {
+                            transport.close();
+                        }
+                    }
+                    ack(message);
+                    javaMailJMSStatisticsLocal.onSuccess(mimeMessage, addresses);
+                    if (logger.isLoggable(Level.INFO)) {
+                        logger.log(Level.INFO, "Message " + mimeMessage.getMessageID() + " (" + mimeMessage.getMessageNumber() + ") successfully sent to destination javaMailSession using " + protocolToUse + " -> " + transport + ".");
+                    }
+                } catch (MessagingException mEx) {
+                    javaMailJMSStatisticsLocal.onFailure(mimeMessage, addresses, mEx);
+                    throw mEx;
+                }
 			} catch(Exception ex) {
 				logger.log(Level.SEVERE, "Error processing JMS message - " + message + ".", ex);
 			}
