@@ -7,13 +7,14 @@ How it works:
 
 
 How to install JavaMail JMS Support:
-1) Copy JavaMail JMS Transport jar into server libs directory. (eg. glassfish3/glassfish/lib)
-2) OPTIONAL: Create logger configuration for "org.jsoftware.javamail.*" (this software uses java.util.logging as logging provider)
-3) Create JNDI resources:
+1) Copy JavaMail JMS Transport jar into server libs directory. (eg. glassfish3/glassfish/lib or glassfish3/glassfish/lib/endorsed)
+2) It is likely that you need to copy also javax.mail-1.5.2.jar - https://maven.java.net/content/repositories/releases/com/sun/mail/javax.mail/1.5.2/
+3) OPTIONAL: Create logger configuration for "org.jsoftware.javamail.*" (this software uses java.util.logging as logging provider)
+4) Create JNDI resources:
     a) JNDI: jms/queueConnectionFactory		Type: javax.jms.QueueConnectionFactory
     b) JNDI: jms/mailQueue			Type: javax.jms.Queue			(this is where messages will be stored)
     c) JNDI: mail/Session			Type: javax.mail.Session        (only one is required)
-	Configure two transports in mail/Session:
+	Configure two transports on single instance of mail/Session:
 	    i) JMS Transport (as default)
 		Protocol: smtpjms
 		Transport Protocol Class: org.jsoftware.javamail.SmtpJmsTransport
@@ -33,8 +34,8 @@ Smtp options:
 		Protocol: (see configuration for JMS Transport)		default: smtp
 		Transport Protocol Class:				            default: com.sun.mail.smtp.SMTPTransport
 		Other configuration properties required by the transport.
-4) Deploy Message Driven Bean (project:javamail-jms2javamail) that transfers messages from JMSQueue (jms/mailQueue) to "dstProtocol" of javaMail Session.
-5) Use mail/session JNDI resource in your applications. Do not forget to setup FROM field in each message.
+5) Deploy Message Driven Bean (project:javamail-jms2javamail) that transfers messages from JMSQueue (jms/mailQueue) to "dstProtocol" of javaMail Session.
+6) Use mail/session JNDI resource in your applications. Do not forget to setup FROM field in each message.
 
 
 Extra mail features:
