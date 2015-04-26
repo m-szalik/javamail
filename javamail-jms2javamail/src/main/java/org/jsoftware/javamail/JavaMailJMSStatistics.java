@@ -27,11 +27,38 @@ import java.util.concurrent.atomic.AtomicLong;
 @Singleton(name = "JavaMailJMSStatisticsLocal")
 @Startup
 public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implements JavaMailJMSStatisticsLocal, JavaMailJMSStatisticsMXBean {
+    private static final CompositeType ROW_HEADER_TYPE, ROW_ADDR_TYPE, MAIL_INFO_TYPE;
+    private static final TabularType TAB_ADDR_TYPE, TAB_HEADER_TYPE;
     private MBeanServer platformMBeanServer;
     private ObjectName objectName = null;
     private Date startDate;
     private MessageAndAddresses lastSuccessMessage, lastFailMessage;
     private final AtomicLong successCounter = new AtomicLong(0), failureCounter = new AtomicLong(0), seq = new AtomicLong(0);
+
+    static {
+        try {
+            ROW_HEADER_TYPE = new CompositeType("MailHeaders", "Mail headers",
+                    new String[]{"header-name", "header-value"},
+                    new String[]{"Name", "Value"},
+                    new OpenType[]{SimpleType.STRING, SimpleType.STRING}
+            );
+            ROW_ADDR_TYPE = new CompositeType("MailAddress", "Mail single address",
+                new String[]{"addressType", "address"},
+                new String[]{"Address type", "Email address"},
+                new OpenType[]{SimpleType.STRING, SimpleType.STRING}
+            );
+            TAB_ADDR_TYPE = new TabularType("Addresses", "Mail addresses", ROW_ADDR_TYPE, new String[] {"addressType", "address"});
+            TAB_HEADER_TYPE = new TabularType("Headers", "Mail headers", ROW_HEADER_TYPE, new String[] {"header-name"});
+            MAIL_INFO_TYPE = new CompositeType("MailInfo", "Mail info",
+                    new String[]{"messageId", "date", "subject", "toAddresses", "headers", "errorDescription"},
+                    new String[]{"Message ID", "Sent date", "Message subject", "Table of addresses", "Message headers", "Error description if any"},
+                    new OpenType[]{SimpleType.STRING, SimpleType.DATE, SimpleType.STRING, TAB_ADDR_TYPE, TAB_HEADER_TYPE, SimpleType.STRING}
+            );
+        } catch (OpenDataException e) {
+            throw new RuntimeException("Cannot create openTypes", e);
+        }
+    }
+
 
     @PostConstruct
     public void registerInJMX() {
@@ -131,34 +158,15 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
             return null;
         }
         try {
-            CompositeType rowHeaderType = new CompositeType("MailHeaders", "Mail headers",
-                    new String[]{"header-name", "header-value"},
-                    new String[]{"Name", "Value"},
-                    new OpenType[]{SimpleType.STRING, SimpleType.STRING}
-            );
-
-            CompositeType rowAddrType = new CompositeType("MailAddress", "Mail single address",
-                    new String[]{"addressType", "address"},
-                    new String[]{"Address type", "Email address"},
-                    new OpenType[]{SimpleType.STRING, SimpleType.STRING}
-            );
-            TabularType tabAddressType = new TabularType("Addresses", "Mail addresses", rowAddrType, new String[] {"addressType", "address"});
-            TabularType tabHeadersType = new TabularType("Headers", "Mail headers", rowHeaderType, new String[] {"header-name"});
-
-            CompositeType retType = new CompositeType("MailInfo", "Mail info",
-                    new String[]{"messageId", "date", "subject", "toAddresses", "headers", "errorDescription"},
-                    new String[]{"Message ID", "Sent date", "Message subject", "Table of addresses", "Message headers", "Error description if any"},
-                    new OpenType[]{SimpleType.STRING, SimpleType.DATE, SimpleType.STRING, tabAddressType, tabHeadersType, SimpleType.STRING}
-            );
-            TabularData addrData = new TabularDataSupport(tabAddressType);
+            TabularData addrData = new TabularDataSupport(TAB_ADDR_TYPE);
             for(Address addr : maa.getAddresses()) {
-                addrData.put(new CompositeDataSupport(rowAddrType, new String[]{"addressType", "address"}, new Object[]{addr.getType(), addr.toString()}));
+                addrData.put(new CompositeDataSupport(ROW_ADDR_TYPE, new String[]{"addressType", "address"}, new Object[]{addr.getType(), addr.toString()}));
             }
-            TabularData headerData = new TabularDataSupport(tabHeadersType);
+            TabularData headerData = new TabularDataSupport(TAB_HEADER_TYPE);
             Enumeration en = maa.getMessage().getAllHeaders();
             while (en.hasMoreElements()) {
                 Header header = (Header) en.nextElement();
-                headerData.put(new CompositeDataSupport(rowHeaderType, new String[]{"header-name", "header-value"}, new Object[]{header.getName(), header.getValue()}));
+                headerData.put(new CompositeDataSupport(ROW_HEADER_TYPE, new String[]{"header-name", "header-value"}, new Object[]{header.getName(), header.getValue()}));
             }
             String error = null;
             if (maa.getException() != null) {
@@ -168,7 +176,7 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
                 sw.flush();
                 error = sw.toString();
             }
-            return new CompositeDataSupport(retType,
+            return new CompositeDataSupport(MAIL_INFO_TYPE,
                     new String[] {"messageId", "date", "subject", "toAddresses", "headers", "errorDescription"},
                     new Object[]{maa.getMessage().getMessageID(), new Date(maa.getTimestamp()), maa.getMessage().getSubject(), addrData, headerData, error}
             );
