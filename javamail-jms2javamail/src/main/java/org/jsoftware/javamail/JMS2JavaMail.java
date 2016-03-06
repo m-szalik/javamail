@@ -1,5 +1,6 @@
 package org.jsoftware.javamail;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
@@ -9,11 +10,13 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.mail.Address;
 import javax.mail.MessagingException;
+import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +29,7 @@ import java.util.logging.Logger;
 @MessageDriven(mappedName = "jms/mailQueue", name = "mailQueue")
 public class JMS2JavaMail implements MessageListener {
 	private final Logger logger = Logger.getLogger(getClass().getName());
+	private JavaMailSessionDelegate javaMailSessionDelegate;
 
     /** Mail session to be used to send a message */
 	@Resource(mappedName="mail/Session")
@@ -33,6 +37,15 @@ public class JMS2JavaMail implements MessageListener {
 
     @EJB
     private JavaMailJMSStatisticsLocal javaMailJMSStatisticsLocal;
+
+	public JMS2JavaMail() {
+	}
+
+	/* For testing */
+	JMS2JavaMail(JavaMailSessionDelegate javaMailSessionDelegate, JavaMailJMSStatistics javaMailJMSStatistics) {
+		this.javaMailSessionDelegate = javaMailSessionDelegate;
+		this.javaMailJMSStatisticsLocal = javaMailJMSStatistics;
+	}
 
 
 	public void onMessage(Message message) {
@@ -53,9 +66,9 @@ public class JMS2JavaMail implements MessageListener {
 				ObjectInputStream ois = new ObjectInputStream(bais);
 				String protocolToUse = ois.readUTF();
 				Address[] addresses = (Address[]) ois.readObject();
-				MimeMessage mimeMessage = new MimeMessage(session, ois);
+				MimeMessage mimeMessage = javaMailSessionDelegate.createMimeMessage(ois);
                 try {
-                    Transport transport = session.getTransport(protocolToUse);
+                    Transport transport = javaMailSessionDelegate.findTransport(protocolToUse);
                     if (transport.isConnected()) {
                         transport.sendMessage(mimeMessage, addresses);
                     } else {
@@ -83,8 +96,23 @@ public class JMS2JavaMail implements MessageListener {
 			ack(message);
 		}
 	}
-	
-	
+
+	@PostConstruct
+	public void init() {
+		if (session == null) {
+			throw new IllegalStateException("JavaMail session is null.");
+		}
+		javaMailSessionDelegate = new JavaMailSessionDelegate() {
+			@Override
+			public Transport findTransport(String protocolToUse) throws NoSuchProviderException {
+				return session.getTransport(protocolToUse);
+			}
+			@Override
+			public MimeMessage createMimeMessage(InputStream inputStream) throws MessagingException {
+				return new MimeMessage(session, inputStream);
+			}
+		};
+	}
 
 	private void ack(Message message) {
 		try {

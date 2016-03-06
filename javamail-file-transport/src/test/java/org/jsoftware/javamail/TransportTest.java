@@ -1,11 +1,21 @@
 package org.jsoftware.javamail;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.mail.*;
-import javax.mail.internet.*;
+import javax.mail.Address;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -13,16 +23,23 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 
-//@Ignore
 public class TransportTest {
     private Address[] toAddress;
     private Session session;
     private ByteArrayOutputStream outputStream;
+    private File outDir;
 
     @Before
     public void setup() throws AddressException, IOException {
+        String outDirName = "target/output";
         Properties properties = new Properties();
-        properties.put("mail.files.path", "target/output");
+        outDir = new File(outDirName);
+        if (outDir.exists()) {
+            for(File f : outDir.listFiles()) {
+                f.delete();
+            }
+        }
+        properties.put("mail.files.path", outDirName);
         session = Session.getDefaultInstance(properties);
         toAddress = new Address[] { new InternetAddress("abc@test.com") };
         outputStream = new ByteArrayOutputStream();
@@ -50,6 +67,16 @@ public class TransportTest {
         transport.sendMessage(generateMessage(), toAddress);
     }
 
+    @Test
+    public void transportSendMessageTest() throws Exception {
+        AbstractFileTransport transport = (AbstractFileTransport) session.getTransport("filetxt");
+        MimeMessage message = generateMessage();
+        transport.sendMessage(message, toAddress);
+        File[] msgFiles = outDir.listFiles();
+        Assert.assertEquals(1, msgFiles.length);
+        Assert.assertTrue(msgFiles[0].length() > 0);
+        Assert.assertTrue(msgFiles[0].getName().endsWith(".txt"));
+    }
 
     /**
      * Generate multi part / alternative message
@@ -66,6 +93,7 @@ public class TransportTest {
         multiPart.addBodyPart(textPart); // first
         multiPart.addBodyPart(htmlPart); // second
         msg.setContent(multiPart);
+        msg.addHeader("X-Custom-Header", "CustomValue");
         return msg;
     }
 
@@ -77,7 +105,6 @@ public class TransportTest {
         for(String l : content.split("\n")) {
             if (! l.startsWith("Date:") && ! l.startsWith("Message-ID:") && ! l.contains("Part")) {
                 m.update(l.getBytes());
-                System.out.println(l);
             }
         }
         byte[] digest = m.digest();

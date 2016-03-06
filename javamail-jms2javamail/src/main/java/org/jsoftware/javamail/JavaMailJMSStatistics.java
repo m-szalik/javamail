@@ -24,17 +24,21 @@ import java.util.concurrent.atomic.AtomicLong;
 @Singleton(name = "JavaMailJMSStatisticsLocal")
 @Startup
 public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implements JavaMailJMSStatisticsLocal, DynamicMBean {
+    public static final String NOTIFICATION_TYPE_SUCCESS = "JavaMail-Send-Success";
+    public static final String JAVA_MAIL_SEND_FAILURE = "JavaMail-Send-Failure";
+    public static final ObjectName JMX_OBJECT_NAME;
+
+    private MBeanServer platformMBeanServer;
     private static final MBeanInfo M_BEAN_INFO;
     private static final CompositeType ROW_HEADER_TYPE, ROW_ADDR_TYPE, MAIL_INFO_TYPE;
     private static final TabularType TAB_ADDR_TYPE, TAB_HEADER_TYPE;
-    private MBeanServer platformMBeanServer;
-    private ObjectName objectName = null;
     private Date startDate;
     private MessageAndAddresses lastSuccessMessage, lastFailMessage;
-    private final AtomicLong successCounter = new AtomicLong(0), failureCounter = new AtomicLong(0), seq = new AtomicLong(0);
+    final AtomicLong successCounter = new AtomicLong(0), failureCounter = new AtomicLong(0), seq = new AtomicLong(0);
 
     static {
         try {
+            JMX_OBJECT_NAME = new ObjectName("JavaMailJMS:type=" + JavaMailJMSStatistics.class.getName());
             ROW_HEADER_TYPE = new CompositeType("MailHeaders", "Mail headers",
                     new String[]{"header-name", "header-value"},
                     new String[]{"Name", "Value"},
@@ -68,6 +72,8 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
             );
         } catch (OpenDataException e) {
             throw new RuntimeException("Cannot create openTypes", e);
+        } catch (MalformedObjectNameException e) {
+            throw new RuntimeException("Cannot create JMX Object Name", e);
         }
     }
 
@@ -76,9 +82,8 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
     public void registerInJMX() {
         try {
             reset();
-            objectName = new ObjectName("JavaMailJMS:type=" + getClass().getName());
             platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
-            platformMBeanServer.registerMBean(this, objectName);
+            platformMBeanServer.registerMBean(this, JMX_OBJECT_NAME);
         } catch (Exception e) {
             throw new IllegalStateException("Problem during registration of JavaMailStatistics into JMX:" + e, e);
         }
@@ -87,7 +92,7 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
     @PreDestroy
     public void unregisterFromJMX() {
         try {
-            platformMBeanServer.unregisterMBean(this.objectName);
+            platformMBeanServer.unregisterMBean(this.JMX_OBJECT_NAME);
         } catch (Exception e) {
             throw new IllegalStateException("Problem during unregistration of JavaMailStatistics from JMX:" + e, e);
         }
@@ -119,9 +124,9 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
         try {
             Notification notification;
             if (maa.getException() == null) {
-                notification = new Notification("JavaMail-Send-Success", maa.getMessage().getMessageID(), seq.incrementAndGet(), "Sent");
+                notification = new Notification(NOTIFICATION_TYPE_SUCCESS, maa.getMessage().getMessageID(), seq.incrementAndGet(), "Sent");
             } else {
-                notification = new Notification("JavaMail-Send-Failure", maa.getMessage().getMessageID(), seq.incrementAndGet(), "Exception:" + maa.getException());
+                notification = new Notification(JAVA_MAIL_SEND_FAILURE, maa.getMessage().getMessageID(), seq.incrementAndGet(), "Exception:" + maa.getException());
             }
             StringBuilder sb = new StringBuilder();
             sb.append("Subject:").append(maa.getMessage().getSubject()).append('\n');
