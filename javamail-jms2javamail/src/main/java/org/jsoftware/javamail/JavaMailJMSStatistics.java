@@ -34,7 +34,7 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
     private static final TabularType TAB_ADDR_TYPE, TAB_HEADER_TYPE;
     private Date startDate;
     private MessageAndAddresses lastSuccessMessage, lastFailMessage;
-    final AtomicLong successCounter = new AtomicLong(0), failureCounter = new AtomicLong(0), seq = new AtomicLong(0);
+    private final AtomicLong successCounter = new AtomicLong(0), failureCounter = new AtomicLong(0), seq = new AtomicLong(0);
 
     static {
         try {

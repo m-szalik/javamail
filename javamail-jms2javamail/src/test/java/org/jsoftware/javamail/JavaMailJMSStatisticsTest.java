@@ -10,10 +10,12 @@ import javax.mail.Address;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.management.MBeanInfo;
 import javax.management.MBeanServer;
 import javax.management.Notification;
 import javax.management.NotificationListener;
 import java.lang.management.ManagementFactory;
+import java.util.Date;
 
 import static org.mockito.Mockito.when;
 
@@ -42,22 +44,23 @@ public class JavaMailJMSStatisticsTest {
     @Test
     public void testOnSuccess() throws Exception {
         javaMailJMSStatistics.onSuccess(mimeMessage, addressesTo);
-        Assert.assertEquals(1, javaMailJMSStatistics.successCounter.get());
+        Assert.assertEquals(1L, getMbeanAttribute("countSuccessful"));
     }
 
     @Test
     public void testOnFailure() throws Exception {
         javaMailJMSStatistics.onFailure(mimeMessage, addressesTo, new IllegalArgumentException());
-        Assert.assertEquals(1, javaMailJMSStatistics.failureCounter.get());
+        Assert.assertEquals(1L, getMbeanAttribute("countFailure"));
     }
 
     @Test
     public void testReset() throws Exception {
-        javaMailJMSStatistics.failureCounter.set(12);
-        javaMailJMSStatistics.successCounter.set(3344);
+        Date date = new Date();
+        javaMailJMSStatistics.onSuccess(mimeMessage, addressesTo);
         javaMailJMSStatistics.invoke("reset", new Object[0], new String[0]);
-        Assert.assertEquals(0, javaMailJMSStatistics.successCounter.get());
-        Assert.assertEquals(0, javaMailJMSStatistics.failureCounter.get());
+        Assert.assertEquals(0L, getMbeanAttribute("countSuccessful"));
+        Date d = (Date) getMbeanAttribute("statisticsCollectionStartDate");
+        Assert.assertTrue(d.after(date));
     }
 
     @Test
@@ -76,5 +79,18 @@ public class JavaMailJMSStatisticsTest {
         platformMBeanServer.removeNotificationListener(JavaMailJMSStatistics.JMX_OBJECT_NAME, listener);
         // check
         Assert.assertEquals(JavaMailJMSStatistics.NOTIFICATION_TYPE_SUCCESS, result.toString());
+    }
+
+    @Test
+    public void testJmxMBeanInfo() throws Exception {
+        MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
+        platformMBeanServer.getMBeanInfo(JavaMailJMSStatistics.JMX_OBJECT_NAME);
+        // no exceptions = ok
+    }
+
+    private static Object getMbeanAttribute(String attrName) throws Exception {
+        MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
+        MBeanInfo mBeanInfo = platformMBeanServer.getMBeanInfo(JavaMailJMSStatistics.JMX_OBJECT_NAME);
+        return platformMBeanServer.getAttribute(JavaMailJMSStatistics.JMX_OBJECT_NAME, attrName);
     }
 }
