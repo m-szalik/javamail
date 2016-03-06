@@ -54,14 +54,14 @@ public class TransportTest {
 	public void transportTxtTest() throws MessagingException, IOException, NoSuchAlgorithmException {
 		AbstractFileTransport transport = (AbstractFileTransport) session.getTransport("filetxt");
         transport.writeMessage(generateMessage(), outputStream);
-        org.junit.Assert.assertEquals("4c7fb32ade5f1e860d9f8234b1ba8d5a", md5sumFromOutput());
+        org.junit.Assert.assertEquals("10e5c47d151c47ef62c23ca998d1b55a", md5sumFromOutput());
 	}
 
     @Test
     public void transportMsgTest() throws MessagingException, IOException, NoSuchAlgorithmException {
         AbstractFileTransport transport = (AbstractFileTransport) session.getTransport("filemsg");
         transport.writeMessage(generateMessage(), outputStream);
-        org.junit.Assert.assertEquals("789f256c33750a89b804a6c667e85d35", md5sumFromOutput());
+        org.junit.Assert.assertEquals("f351530889938d0625739a37bab0b992", md5sumFromOutput());
     }
 
     @Test
