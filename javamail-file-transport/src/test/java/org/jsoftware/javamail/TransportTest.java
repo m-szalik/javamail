@@ -35,8 +35,11 @@ public class TransportTest {
         Properties properties = new Properties();
         outDir = new File(outDirName);
         if (outDir.exists()) {
-            for(File f : outDir.listFiles()) {
-                f.delete();
+            File[] files = outDir.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    f.delete();
+                }
             }
         }
         properties.put("mail.files.path", outDirName);
@@ -73,6 +76,7 @@ public class TransportTest {
         MimeMessage message = generateMessage();
         transport.sendMessage(message, toAddress);
         File[] msgFiles = outDir.listFiles();
+        Assert.assertNotNull(msgFiles);
         Assert.assertEquals(1, msgFiles.length);
         Assert.assertTrue(msgFiles[0].length() > 0);
         Assert.assertTrue(msgFiles[0].getName().endsWith(".txt"));

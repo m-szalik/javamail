@@ -92,7 +92,7 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
     @PreDestroy
     public void unregisterFromJMX() {
         try {
-            platformMBeanServer.unregisterMBean(this.JMX_OBJECT_NAME);
+            platformMBeanServer.unregisterMBean(JMX_OBJECT_NAME);
         } catch (Exception e) {
             throw new IllegalStateException("Problem during unregistration of JavaMailStatistics from JMX:" + e, e);
         }
@@ -167,9 +167,7 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
                     new String[] {"messageId", "date", "subject", "toAddresses", "headers", "errorDescription"},
                     new Object[]{maa.getMessage().getMessageID(), new Date(maa.getTimestamp()), maa.getMessage().getSubject(), addrData, headerData, error}
             );
-        } catch (OpenDataException e) {
-            throw new RuntimeException(e);
-        } catch (MessagingException e) {
+        } catch (OpenDataException | MessagingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -180,10 +178,10 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
         if (attributeNames.length == 0) {
             return resultList;
         }
-        for (int i = 0; i < attributeNames.length; i++) {
+        for (String attributeName : attributeNames) {
             try {
-                Object value = getAttribute(attributeNames[i]);
-                resultList.add(new Attribute(attributeNames[i], value));
+                Object value = getAttribute(attributeName);
+                resultList.add(new Attribute(attributeName, value));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

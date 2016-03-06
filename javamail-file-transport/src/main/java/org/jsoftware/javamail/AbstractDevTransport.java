@@ -79,7 +79,7 @@ abstract class AbstractDevTransport extends Transport {
      * @throws IOException
      */
     static Map<String,String> extractTextParts(Multipart multiPart) throws MessagingException, IOException {
-        HashMap<String,String> bodies = new HashMap<String,String>();
+        HashMap<String,String> bodies = new HashMap<>();
         for(int i = 0; i < multiPart.getCount(); i++) {
             checkPart(bodies, multiPart.getBodyPart(i));
         }
