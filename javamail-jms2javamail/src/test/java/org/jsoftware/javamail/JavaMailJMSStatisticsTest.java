@@ -7,14 +7,18 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import javax.mail.Address;
+import javax.mail.Header;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.management.MBeanInfo;
 import javax.management.MBeanServer;
 import javax.management.Notification;
 import javax.management.NotificationListener;
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.TabularData;
 import java.lang.management.ManagementFactory;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 import static org.mockito.Mockito.when;
@@ -33,7 +37,9 @@ public class JavaMailJMSStatisticsTest {
         javaMailJMSStatistics = new JavaMailJMSStatistics();
         javaMailJMSStatistics.registerInJMX();
         mimeMessage = Mockito.mock(MimeMessage.class);
+        when(mimeMessage.getAllHeaders()).thenReturn(Collections.enumeration(Arrays.asList(new Header("h1", "v1"), new Header("h2", "v2"))));
         when(mimeMessage.getMessageID()).thenReturn("MessageId");
+        when(mimeMessage.getSubject()).thenReturn("MessageSubject");
     }
 
     @After
@@ -88,9 +94,22 @@ public class JavaMailJMSStatisticsTest {
         // no exceptions = ok
     }
 
+    @Test
+    public void testMessageInfo() throws Exception {
+        javaMailJMSStatistics.onFailure(mimeMessage, addressesTo, new IllegalStateException());
+        CompositeData info = (CompositeData) getMbeanAttribute("lastFailureMailInfo");
+        Assert.assertTrue(info.get("date") instanceof Date);
+        Assert.assertTrue(info.get("errorDescription").toString().contains("IllegalStateException"));
+        TabularData tab = (TabularData) info.get("headers");
+        Assert.assertEquals(2, tab.size());
+        Assert.assertEquals("MessageId", info.get("messageId"));
+        tab = (TabularData) info.get("toAddresses");
+        Assert.assertEquals(1, tab.size());
+        Assert.assertEquals("MessageSubject", info.get("subject"));
+    }
+
     private static Object getMbeanAttribute(String attrName) throws Exception {
         MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
-        MBeanInfo mBeanInfo = platformMBeanServer.getMBeanInfo(JavaMailJMSStatistics.JMX_OBJECT_NAME);
         return platformMBeanServer.getAttribute(JavaMailJMSStatistics.JMX_OBJECT_NAME, attrName);
     }
 }
