@@ -6,7 +6,7 @@
 	<parent>
 	    <groupId>org.jsoftware</groupId>
 	    <artifactId>javamail</artifactId>
-        <version>1.5.5</version>
+        <version>1.5.6-SNAPSHOT</version>
 	</parent>
 	
 	<url>http://jsoftware.org</url>
