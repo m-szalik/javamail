@@ -4,6 +4,7 @@ javaMail extensions
 [![Join the chat at https://gitter.im/m-szalik/javamail](https://badges.gitter.im/m-szalik/javamail.svg)](https://gitter.im/m-szalik/javamail?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/m-szalik/javamail.svg?branch=master)](https://travis-ci.org/m-szalik/javamail)
 [![codecov.io](https://codecov.io/github/m-szalik/javamail/coverage.svg?branch=master)](https://codecov.io/github/m-szalik/javamail?branch=master)
+[![Dependency Status](https://www.versioneye.com/user/projects/56e2c695df573d00431139b0/badge.svg?style=flat)](https://www.versioneye.com/user/projects/56e2c695df573d00431139b0)
 
 ### For developers:
 Allows sending emails form your application using java.mail.Session to a file that is helpful during development phase.
