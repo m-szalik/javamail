@@ -70,8 +70,8 @@ abstract class AbstractFileTransport extends AbstractDevTransport {
      * Write message
      * @param message message
      * @param os where to write
-     * @throws IOException
-     * @throws MessagingException
+     * @throws IOException when message generation error occurs
+     * @throws MessagingException when sending message error occurs
      */
     protected abstract void writeMessage(Message message, OutputStream os) throws IOException, MessagingException;
 

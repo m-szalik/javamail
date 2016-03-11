@@ -16,12 +16,12 @@ import java.util.logging.Logger;
 
 /**
  * Sends {@link Message}s to JMS {@link Queue}.
- * <p>Additional message headers are supported:
+ * Additional message headers are supported:
  * <ul>
  *     <li><b>X-Send-expire</b> = is translated to JMS TTL</li>
  *     <li><b>X-Send-priority</b> = is translated to JMS priority (allowed number also <i>normal</i>, <i>high</i> and <i>low</i></li>
  * </ul>
- * </p>
+ * 
  * @see javax.jms.MessageProducer#setTimeToLive(long)
  * @see javax.jms.Message#setJMSPriority(int)
  * @see #createJmsMessage(javax.jms.QueueSession, javax.mail.Message, javax.mail.Address[])
