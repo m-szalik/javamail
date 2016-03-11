@@ -68,7 +68,7 @@
         <module>javamail-file-transport</module>
         <module>javamail-jms-transport</module>
         <module>javamail-jms2javamail</module>
-        <!-- Do not include because it then it goes to repo <module>javamail-test-webapp</module> -->
+        <module>javamail-test-webapp</module>
     </modules>
 
     <scm>
