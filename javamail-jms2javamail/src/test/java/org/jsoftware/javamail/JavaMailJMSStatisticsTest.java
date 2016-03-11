@@ -62,6 +62,7 @@ public class JavaMailJMSStatisticsTest {
     @Test
     public void testReset() throws Exception {
         Date date = new Date();
+        Thread.sleep(2000);
         javaMailJMSStatistics.onSuccess(mimeMessage, addressesTo);
         javaMailJMSStatistics.invoke("reset", new Object[0], new String[0]);
         Assert.assertEquals(0L, getMbeanAttribute("countSuccessful"));
