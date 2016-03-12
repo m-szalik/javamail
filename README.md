@@ -34,13 +34,13 @@ You can download a webapp application, which works with jetty to see how it work
  1. Enter javamail-test-webapp directory `cd javamail/javamail-test-webapp/`
  1. Run it with maven and jetty `mvn jetty:run`
  1. Go to [http://localhost:8080/webapp](http://localhost:8080/webapp) and click to send an email
- 1. Use your favourite text editor to see en email in **target/messages** directory
+ 1. Use your favourite text editor to view an email located in **target/messages** directory
 
 ### License
 Apache License 2.0
 
 ### Problems and questions
-In case of problems or questions contact me by [creating an issue](https://github.com/m-szalik/javamail/issues/new) on GitHub.
+In case of problems or questions contact me by [creating an issue](https://github.com/m-szalik/javamail/issues/new) on GitHub or via [![Join the chat at https://gitter.im/m-szalik/javamail](https://badges.gitter.im/m-szalik/javamail.svg)](https://gitter.im/m-szalik/javamail?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge).
 
 ### More info on Wiki
 https://github.com/m-szalik/javamail/wiki
