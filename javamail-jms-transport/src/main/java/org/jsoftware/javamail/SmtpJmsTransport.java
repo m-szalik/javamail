@@ -29,15 +29,15 @@ import java.util.logging.Logger;
  */
 public class SmtpJmsTransport extends Transport {
     private final static Address[] ADDRESSES_EMPTY = new Address[0];
-	private static final String X_SEND_PRIORITY = "X-Send-priority";
-	private static final String X_SEND_EXPIRE = "X-Send-expire";
+	static final String X_SEND_PRIORITY = "X-Send-priority";
+	static final String X_SEND_EXPIRE = "X-Send-expire";
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private final QueueConnectionFactory queueConnectionFactory;
 	private final Queue mailQueue;
 	private final boolean validateFrom;
 	private final String protocolToUse;
     private final int jmsDeliveryMode;
-	
+
 	public SmtpJmsTransport(Session session, URLName urlname) {
 		super(session, urlname);
 		try {
