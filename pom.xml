@@ -73,7 +73,8 @@
         <module>javamail-file-transport</module>
         <module>javamail-jms-transport</module>
         <module>javamail-jms2javamail</module>
-        <module>javamail-test-webapp</module>
+        <module>docs/examples/standalone-example</module>
+        <module>docs/examples/webapp-example</module>
     </modules>
 
     <scm>

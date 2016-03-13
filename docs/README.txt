@@ -1,5 +1,5 @@
 Version info:
-	1.5.0 for jdk7
+	1.5.5 for jdk7 and newer
 	
 How it works:
     Application ---> mail/session(JMSTransport as default) ---> JMS mailQueue
