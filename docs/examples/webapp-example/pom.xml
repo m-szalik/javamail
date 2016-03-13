@@ -31,7 +31,7 @@
                     <dependency>
                         <groupId>org.jsoftware</groupId>
                         <artifactId>javamail-file-transport</artifactId>
-                        <version>1.5.2-SNAPSHOT</version>
+                        <version>${project.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>javax.mail</groupId>
