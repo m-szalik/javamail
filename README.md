@@ -30,7 +30,7 @@ You can choose transport one of:
 * **javamail-jms2javamail** = an EJB that copies emails from JMS to real javaMail session - for admins
 
 #### Configuration
-For configuration examples see [docs/README.txt](./docs/README.txt)
+For configuration examples see [docs/README.md](./docs/README.md)
 
 #### Webapp demo (Jetty)
 It takes **5 steps only** to see how it works.
