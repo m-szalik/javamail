@@ -16,8 +16,8 @@
  * JNDI: jms/mailQueue			Type: javax.jms.Queue			(this is where messages will be stored)
  * JNDI: mail/Session			Type: javax.mail.Session        (only one is required)
  * Configure two transports on single instance of mail/Session:
-    * 1st transport - JMS Transport (as default) - see below
-    * 2nd transport - SMTP Transport (used by javamail-jms2javamail EJB to send emails) - see below
+    * **1st transport** - JMS Transport (as default) - [see below](#jms-transport-configuration)
+    * **2nd transport** - SMTP Transport (used by javamail-jms2javamail EJB to send emails) - [see below](#smtp-transport-configuration)
 5) Deploy Message Driven Bean (project:javamail-jms2javamail) that transfers messages from JMSQueue (jms/mailQueue) to "dstProtocol" of javaMail Session.
 6) Use mail/session JNDI resource in your applications. Do not forget to setup FROM field in each message.
 
