@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>javamail-example-webapp</artifactId>
     <url>http://jsoftware.org</url>
-    <name>JMS2JavaMail - Testing webapp.</name>
+    <name>Javamail: Weabpp example</name>
 
     <dependencies>
         <dependency>
