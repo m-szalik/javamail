@@ -50,6 +50,7 @@ public class JMS2JavaMail implements MessageListener {
 
 	public void onMessage(Message message) {
 		if (message instanceof BytesMessage) {
+			String protocolToUse = null;
 			try {
 				BytesMessage bMsg = (BytesMessage) message;
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -64,7 +65,7 @@ public class JMS2JavaMail implements MessageListener {
 				} while (true);
 				ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 				ObjectInputStream ois = new ObjectInputStream(bais);
-				String protocolToUse = ois.readUTF();
+				protocolToUse = ois.readUTF();
 				Address[] addresses = (Address[]) ois.readObject();
 				MimeMessage mimeMessage = javaMailSessionDelegate.createMimeMessage(ois);
                 try {
@@ -89,7 +90,7 @@ public class JMS2JavaMail implements MessageListener {
                     throw mEx;
                 }
 			} catch(Exception ex) {
-				logger.log(Level.SEVERE, "Error processing JMS message - " + message + ".", ex);
+				logger.log(Level.SEVERE, "Error processing JMS message - " + message + ". Protocol: " + protocolToUse, ex);
 			}
 		} else {
 			logger.warning("Found message that is not BytesMessage - " + message + ", " + message.getClass());
