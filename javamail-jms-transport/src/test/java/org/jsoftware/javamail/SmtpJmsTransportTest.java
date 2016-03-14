@@ -36,6 +36,7 @@ import static org.mockito.Mockito.when;
 
 public class SmtpJmsTransportTest {
     private BytesMessage bytesMessage;
+    private QueueSender queueSender;
 
     @Before
     public void setUp() throws Exception {
@@ -46,7 +47,7 @@ public class SmtpJmsTransportTest {
         TestContextFactory.context = context;
         when(context.lookup(eq("jms/queueConnectionFactory"))).thenReturn(queueConnectionFactory);
         when(context.lookup(eq("jms/mailQueue"))).thenReturn(queue);
-        QueueSender queueSender = Mockito.mock(QueueSender.class);
+        queueSender = Mockito.mock(QueueSender.class);
         QueueConnection queueConnection = Mockito.mock(QueueConnection.class);
         when(queueConnectionFactory.createQueueConnection()).thenReturn(queueConnection);
         when(queueConnectionFactory.createQueueConnection(anyString(), anyString())).thenReturn(queueConnection);
@@ -134,5 +135,17 @@ public class SmtpJmsTransportTest {
         when(message.getFrom()).thenReturn(new Address[] { new InternetAddress("from@server.com") });
         transport.sendMessage(message, new Address[] { new InternetAddress("text@xtest.nowhere") });
         verify(bytesMessage, never()).setJMSPriority(anyInt());
+    }
+
+    @Test
+    public void testSendWithTTL() throws Exception {
+        SmtpJmsTransport transport = new SmtpJmsTransport(Session.getDefaultInstance(new Properties()), new URLName("jsm"));
+        Message message = Mockito.mock(Message.class);
+        when(message.getHeader(eq(SmtpJmsTransport.X_SEND_EXPIRE))).thenReturn(new String[]{"321"});
+        when(message.getFrom()).thenReturn(new Address[] { new InternetAddress("from@server.com") });
+        transport.sendMessage(message, new Address[] { new InternetAddress("text@xtest.nowhere") });
+        ArgumentCaptor<Long> ttlLongArgumentCaptor = ArgumentCaptor.forClass(Long.class);
+        verify(queueSender, times(1)).setTimeToLive(ttlLongArgumentCaptor.capture());
+        Assert.assertEquals(Long.valueOf(321), ttlLongArgumentCaptor.getValue());
     }
 }

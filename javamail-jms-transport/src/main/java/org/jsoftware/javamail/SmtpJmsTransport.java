@@ -84,7 +84,7 @@ public class SmtpJmsTransport extends Transport {
 				try {
 					queueSender.setTimeToLive(Long.parseLong(str[0]));
 				} catch(Exception e) {
-					logger.warning("Error setting JMS TTL." + e);
+					logger.warning("Error setting JMS TTL. Value='" + str[0] + "'" + e);
 				}
 			}
 			queueConnection.start();
