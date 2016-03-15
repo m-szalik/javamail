@@ -11,6 +11,8 @@ import javax.mail.Header;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.management.Attribute;
+import javax.management.AttributeList;
 import javax.management.MBeanServer;
 import javax.management.Notification;
 import javax.management.NotificationListener;
@@ -20,6 +22,7 @@ import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import static org.mockito.Mockito.when;
 
@@ -107,6 +110,22 @@ public class JavaMailJMSStatisticsTest {
         tab = (TabularData) info.get("toAddresses");
         Assert.assertEquals(1, tab.size());
         Assert.assertEquals("MessageSubject", info.get("subject"));
+    }
+
+    @Test
+    public void testGetAttributes() throws Exception {
+        List<String> attrNames = Arrays.asList("countSuccessful", "countFailure");
+        MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
+        AttributeList attributeList = platformMBeanServer.getAttributes(JavaMailJMSStatistics.JMX_OBJECT_NAME, attrNames.toArray(new String[attrNames.size()]));
+        List<Attribute> list = attributeList.asList();
+        for(Attribute attribute : list) {
+            if (attrNames.contains(attribute.getName())) {
+                Object val = attribute.getValue();
+                Assert.assertTrue(val instanceof Number);
+                continue;
+            }
+            Assert.fail("There is more attributes then expected - " + attribute);
+        }
     }
 
     private static Object getMbeanAttribute(String attrName) throws Exception {
