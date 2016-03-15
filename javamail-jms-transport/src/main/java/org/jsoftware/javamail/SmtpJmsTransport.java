@@ -95,7 +95,7 @@ public class SmtpJmsTransport extends Transport {
             }
             notifyTransportListeners(TransportEvent.MESSAGE_DELIVERED, msg.getAllRecipients(), ADDRESSES_EMPTY, ADDRESSES_EMPTY, msg);
         } catch(JMSException ex) {
-            notifyTransportListeners(TransportEvent.MESSAGE_DELIVERED, ADDRESSES_EMPTY, msg.getAllRecipients(), ADDRESSES_EMPTY, msg);
+            notifyTransportListeners(TransportEvent.MESSAGE_NOT_DELIVERED, ADDRESSES_EMPTY, msg.getAllRecipients(), ADDRESSES_EMPTY, msg);
 			throw new MessagingException("Cannot send message " + msg.toString() + " JMS queue.", ex);
 		} finally {
 			try {

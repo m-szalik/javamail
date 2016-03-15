@@ -7,6 +7,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import javax.jms.BytesMessage;
+import javax.jms.JMSException;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
@@ -17,6 +18,8 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.URLName;
+import javax.mail.event.TransportEvent;
+import javax.mail.event.TransportListener;
 import javax.mail.internet.InternetAddress;
 import javax.naming.Context;
 import java.io.ByteArrayInputStream;
@@ -29,6 +32,7 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -37,6 +41,8 @@ import static org.mockito.Mockito.when;
 public class SmtpJmsTransportTest {
     private BytesMessage bytesMessage;
     private QueueSender queueSender;
+    private SmtpJmsTransport transport;
+    private TransportListener transportListener;
 
     @Before
     public void setUp() throws Exception {
@@ -56,12 +62,13 @@ public class SmtpJmsTransportTest {
         when(queueSession.createBytesMessage()).thenReturn(bytesMessage);
         when(queueConnection.createQueueSession(anyBoolean(), anyInt())).thenReturn(queueSession);
         when(queueSession.createSender(eq(queue))).thenReturn(queueSender);
+        transport = new SmtpJmsTransport(Session.getDefaultInstance(new Properties()), new URLName("jms"));
+        transportListener = Mockito.mock(TransportListener.class);
+        transport.addTransportListener(transportListener);
     }
 
     @Test(expected = MessagingException.class)
     public void testSendWithoutFrom() throws Exception {
-        Properties properties = new Properties();
-        SmtpJmsTransport transport = new SmtpJmsTransport(Session.getDefaultInstance(properties), new URLName("jsm"));
         Message message = Mockito.mock(Message.class);
         transport.sendMessage(message, new Address[] { new InternetAddress("text@xtest.nowhere")});
     }
@@ -69,8 +76,6 @@ public class SmtpJmsTransportTest {
     @Test
     public void testSend() throws Exception {
         final InternetAddress toAddr =  new InternetAddress("text@xtest.nowhere");
-        Properties properties = new Properties();
-        SmtpJmsTransport transport = new SmtpJmsTransport(Session.getDefaultInstance(properties), new URLName("jsm"));
         Message message = Mockito.mock(Message.class);
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[]{"low"});
         when(message.getFrom()).thenReturn(new Address[] { new InternetAddress("from@server.com") });
@@ -87,12 +92,12 @@ public class SmtpJmsTransportTest {
         Assert.assertEquals(toAddr, inAddr[0]);
         Assert.assertEquals("smtp", protocol);
         verify(message, times(1)).writeTo(any(ObjectOutputStream.class));
+        verify(transportListener, times(1)).messageDelivered(any(TransportEvent.class));
     }
 
     @Test
     public void testSendNumberPriority() throws Exception {
         final int prio = 4;
-        SmtpJmsTransport transport = new SmtpJmsTransport(Session.getDefaultInstance(new Properties()), new URLName("jsm"));
         Message message = Mockito.mock(Message.class);
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[]{Integer.toString(prio)});
         when(message.getFrom()).thenReturn(new Address[] { new InternetAddress("from@server.com") });
@@ -116,7 +121,6 @@ public class SmtpJmsTransportTest {
     @Test
     public void testSendNumberPriorityXPriority() throws Exception {
         final int prio = 4;
-        SmtpJmsTransport transport = new SmtpJmsTransport(Session.getDefaultInstance(new Properties()), new URLName("jsm"));
         Message message = Mockito.mock(Message.class);
         when(message.getHeader(eq("X-Priority"))).thenReturn(new String[]{Integer.toString(prio)});
         when(message.getFrom()).thenReturn(new Address[] { new InternetAddress("from@server.com") });
@@ -129,7 +133,6 @@ public class SmtpJmsTransportTest {
 
     @Test
     public void testSendInvalidPriorityXPriority() throws Exception {
-        SmtpJmsTransport transport = new SmtpJmsTransport(Session.getDefaultInstance(new Properties()), new URLName("jsm"));
         Message message = Mockito.mock(Message.class);
         when(message.getHeader(eq("X-Priority"))).thenReturn(new String[]{"invalid"});
         when(message.getFrom()).thenReturn(new Address[] { new InternetAddress("from@server.com") });
@@ -139,7 +142,6 @@ public class SmtpJmsTransportTest {
 
     @Test
     public void testSendWithTTL() throws Exception {
-        SmtpJmsTransport transport = new SmtpJmsTransport(Session.getDefaultInstance(new Properties()), new URLName("jsm"));
         Message message = Mockito.mock(Message.class);
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_EXPIRE))).thenReturn(new String[]{"321"});
         when(message.getFrom()).thenReturn(new Address[] { new InternetAddress("from@server.com") });
@@ -147,5 +149,18 @@ public class SmtpJmsTransportTest {
         ArgumentCaptor<Long> ttlLongArgumentCaptor = ArgumentCaptor.forClass(Long.class);
         verify(queueSender, times(1)).setTimeToLive(ttlLongArgumentCaptor.capture());
         Assert.assertEquals(Long.valueOf(321), ttlLongArgumentCaptor.getValue());
+    }
+
+    @Test
+    public void testFailOnJms() throws Exception {
+        Message message = Mockito.mock(Message.class);
+        when(message.getFrom()).thenReturn(new Address[] { new InternetAddress("from@server.com") });
+        doThrow(new JMSException("mock")).when(queueSender).send(any(javax.jms.Message.class));
+        try {
+            transport.sendMessage(message, new Address[]{new InternetAddress("text@xtest.nowhere")});
+        } catch (MessagingException ex) {
+            Thread.sleep(500);
+            verify(transportListener, times(1)).messageNotDelivered(any(TransportEvent.class));
+        }
     }
 }
