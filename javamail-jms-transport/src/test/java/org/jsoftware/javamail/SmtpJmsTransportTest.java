@@ -163,4 +163,11 @@ public class SmtpJmsTransportTest {
             verify(transportListener, times(1)).messageNotDelivered(any(TransportEvent.class));
         }
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMissingTransportForDstProtocol() throws Exception {
+        Properties properties = new Properties();
+        properties.setProperty("mail.smtpjms.dstProtocol", "notExistingOne");
+        new SmtpJmsTransport(Session.getInstance(properties), new URLName("jms"));
+    }
 }

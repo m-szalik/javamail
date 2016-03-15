@@ -54,7 +54,7 @@ public class SmtpJmsTransport extends Transport {
 		try {
 			session.getTransport(protocolToUse);
 		} catch (NoSuchProviderException e) {
-			throw new RuntimeException("No provider for dstProtocol (" + protocolToUse + ")", e);
+			throw new IllegalArgumentException("No provider for dstProtocol (" + protocolToUse + ")", e);
 		}
         this.jmsDeliveryMode = Integer.parseInt(getProperty(session, "jmsDeliveryMode", Integer.toString(DeliveryMode.PERSISTENT)));
 	}
