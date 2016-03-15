@@ -48,7 +48,7 @@ public class JMS2JavaMailTest {
         when(sessionDelegate.createMimeMessage(any(InputStream.class))).then(new Answer<Object>() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
-                return new MimeMessage(session, (InputStream) invocation.getArguments()[0]);
+            return new MimeMessage(session, (InputStream) invocation.getArguments()[0]);
             }
         });
     }
@@ -66,7 +66,7 @@ public class JMS2JavaMailTest {
         when(message.readBytes(any(byte[].class))).thenAnswer(new Answer<Object>() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
-                return messageBytes.read((byte[]) invocation.getArguments()[0]);
+            return messageBytes.read((byte[]) invocation.getArguments()[0]);
             }
         });
         return message;

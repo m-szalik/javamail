@@ -73,6 +73,7 @@
         <module>javamail-file-transport</module>
         <module>javamail-jms-transport</module>
         <module>javamail-jms2javamail</module>
+        <module>javamail-jms-integration-test</module>
         <module>docs/examples</module>
     </modules>
 

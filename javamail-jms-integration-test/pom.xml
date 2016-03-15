@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>javamail-jms-integration-test</artifactId>
+
+	<parent>
+	    <groupId>org.jsoftware</groupId>
+	    <artifactId>javamail</artifactId>
+	    <version>1.5.6-SNAPSHOT</version>
+	</parent>
+	
+	<url>http://jsoftware.org</url>
+	<name>JavaMail JMS integration test.</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jsoftware</groupId>
+            <artifactId>javamail-jms-transport</artifactId>
+            <version>1.5.6-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoftware</groupId>
+            <artifactId>javamail-jms2javamail</artifactId>
+            <version>1.5.6-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+	        <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
