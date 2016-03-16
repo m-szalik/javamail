@@ -170,4 +170,44 @@ public class SmtpJmsTransportTest {
         properties.setProperty("mail.smtpjms.dstProtocol", "notExistingOne");
         new SmtpJmsTransport(Session.getInstance(properties), new URLName("jms"));
     }
+
+    @Test
+    public void testJmsPriorityMapping() throws Exception {
+        Message message = Mockito.mock(Message.class);
+        // X-Send-priority
+        when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {"low"});
+        Assert.assertEquals(Integer.valueOf(1), SmtpJmsTransport.jmsPriority(message));
+        when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {"high"});
+        Assert.assertEquals(Integer.valueOf(8), SmtpJmsTransport.jmsPriority(message));
+        when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {});
+        Assert.assertNull(SmtpJmsTransport.jmsPriority(message));
+        when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {"normal"});
+        Assert.assertNull(SmtpJmsTransport.jmsPriority(message));
+        // numeric value
+        for(int p=0; p<10; p++) {
+            when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[]{Integer.toString(p)});
+            Assert.assertEquals(Integer.valueOf(p), SmtpJmsTransport.jmsPriority(message));
+        }
+        // less or over limit
+        when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[]{"-2"});
+        Assert.assertEquals(Integer.valueOf(0), SmtpJmsTransport.jmsPriority(message));
+        when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[]{"12"});
+        Assert.assertEquals(Integer.valueOf(9), SmtpJmsTransport.jmsPriority(message));
+        // X-Priority
+        when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {});
+        when(message.getHeader(eq(SmtpJmsTransport.X_PRIORITY))).thenReturn(new String[]{"1"});
+        Assert.assertEquals(Integer.valueOf(8), SmtpJmsTransport.jmsPriority(message));
+        when(message.getHeader(eq(SmtpJmsTransport.X_PRIORITY))).thenReturn(new String[]{"2"});
+        Assert.assertEquals(Integer.valueOf(6), SmtpJmsTransport.jmsPriority(message));
+        when(message.getHeader(eq(SmtpJmsTransport.X_PRIORITY))).thenReturn(new String[]{"4"});
+        Assert.assertEquals(Integer.valueOf(4), SmtpJmsTransport.jmsPriority(message));
+        when(message.getHeader(eq(SmtpJmsTransport.X_PRIORITY))).thenReturn(new String[]{"5"});
+        Assert.assertEquals(Integer.valueOf(1), SmtpJmsTransport.jmsPriority(message));
+        when(message.getHeader(eq(SmtpJmsTransport.X_PRIORITY))).thenReturn(new String[]{"10"}); // unmapped
+        Assert.assertNull(SmtpJmsTransport.jmsPriority(message));
+        // X-Send-priority over X-Send-priority header
+        when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {"high"});
+        when(message.getHeader(eq(SmtpJmsTransport.X_PRIORITY))).thenReturn(new String[]{"5"});
+        Assert.assertEquals(Integer.valueOf(8), SmtpJmsTransport.jmsPriority(message));
+    }
 }

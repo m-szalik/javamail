@@ -28,10 +28,11 @@ import java.util.logging.Logger;
  * @author szalik
  */
 public class SmtpJmsTransport extends Transport {
-    private final static Address[] ADDRESSES_EMPTY = new Address[0];
+	private static final Logger logger = Logger.getLogger(SmtpJmsTransport.class.getName());
+	private final static Address[] ADDRESSES_EMPTY = new Address[0];
 	static final String X_SEND_PRIORITY = "X-Send-priority";
+	static final String X_PRIORITY = "X-Priority";
 	static final String X_SEND_EXPIRE = "X-Send-expire";
-	private final Logger logger = Logger.getLogger(getClass().getName());
 	private final QueueConnectionFactory queueConnectionFactory;
 	private final Queue mailQueue;
 	private final boolean validateFrom;
@@ -131,47 +132,6 @@ public class SmtpJmsTransport extends Transport {
      * </ul>
      */
     private javax.jms.Message createJmsMessage(QueueSession queueSession, Message msg, Address[] addresses) throws JMSException, MessagingException {
-		int priority = -1;    // -1 not set
-		String[] str = msg.getHeader(X_SEND_PRIORITY);
-		if (str != null && str.length > 0) {
-			msg.removeHeader(X_SEND_PRIORITY);
-			try {
-				if("low".equalsIgnoreCase(str[0])) {
-					priority = 1;
-				} else if ("high".equalsIgnoreCase(str[0])) {
-					priority = 8;
-				} else if (! "normal".equalsIgnoreCase(str[0])) {
-                    priority = Integer.parseInt(str[0]);
-					priority = Math.max(priority, 0);
-					priority = Math.min(priority, 9);
-				}
-			} catch(NumberFormatException nfe) {
-				logger.warning("Invalid value for " + X_SEND_PRIORITY + " - " + str[0]);
-			}
-		} else { // no "X-Send-priority" check for mail priority "X-Priority"
-            str = msg.getHeader("X-Priority");
-            if (str != null && str.length > 0) {
-                try {
-                    int xPriority = Integer.parseInt(str[0]);
-                    switch (xPriority) {
-                        case 1:
-                            priority = 8;
-                            break;
-                        case 2:
-                            priority = 6;
-                            break;
-                        case 4:
-                            priority = 4;
-                            break;
-                        case 5:
-                            priority = 1;
-                            break;
-                    }
-                } catch (NumberFormatException ex) {
-                    logger.warning("Invalid \"X-Priority\" header value '" + str[0] + "'!");
-                }
-            }
-        }
 		BytesMessage jms = queueSession.createBytesMessage();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
@@ -183,9 +143,62 @@ public class SmtpJmsTransport extends Transport {
 			throw new MessagingException("Could not send JMS message with mail content for Message-ID:" + msg.getHeader("Message-ID"), e);
 		}
 		jms.writeBytes(baos.toByteArray());
-        if (priority >= 0) {
+		Integer priority = jmsPriority(msg);
+        if (priority != null && priority >= 0) {
             jms.setJMSPriority(priority);
         }
 		return jms;
+	}
+
+	/**
+	 * @param msg message
+	 * @return jms priority or null if default
+	 */
+	static Integer jmsPriority(Message msg) throws MessagingException {
+		Integer priority = null;
+		String[] str = msg.getHeader(X_SEND_PRIORITY);
+		if (str != null && str.length > 0) {
+			msg.removeHeader(X_SEND_PRIORITY);
+			try {
+				if("low".equalsIgnoreCase(str[0])) {
+					priority = 1;
+				} else if ("high".equalsIgnoreCase(str[0])) {
+					priority = 8;
+				} else if (! "normal".equalsIgnoreCase(str[0])) {
+					priority = Integer.parseInt(str[0]);
+					priority = Math.max(priority, 0);
+					priority = Math.min(priority, 9);
+				}
+			} catch(NumberFormatException nfe) {
+				logger.warning("Invalid value for " + X_SEND_PRIORITY + " - " + str[0]);
+			}
+		} else { // if no "X-Send-priority" check for mail priority "X-Priority"
+			str = msg.getHeader(X_PRIORITY);
+			if (str != null && str.length > 0) {
+				try {
+					int xPriority = Integer.parseInt(str[0]);
+					switch (xPriority) {
+						case 1:
+							priority = 8;
+							break;
+						case 2:
+							priority = 6;
+							break;
+						case 4:
+							priority = 4;
+							break;
+						case 5:
+							priority = 1;
+							break;
+						default:
+							logger.warning("Unmapped value for \"" + X_PRIORITY + "\" header: \"" + str[0] + '"');
+							break;
+					}
+				} catch (NumberFormatException ex) {
+					logger.warning("Invalid \"" + X_PRIORITY + "\" header value '" + str[0] + "'!");
+				}
+			}
+		}
+		return priority;
 	}
 }
