@@ -92,6 +92,7 @@ public class SmtpJmsTransportTest {
         Assert.assertEquals(toAddr, inAddr[0]);
         Assert.assertEquals("smtp", protocol);
         verify(message, times(1)).writeTo(any(ObjectOutputStream.class));
+        Thread.sleep(200);
         verify(transportListener, times(1)).messageDelivered(any(TransportEvent.class));
     }
 
