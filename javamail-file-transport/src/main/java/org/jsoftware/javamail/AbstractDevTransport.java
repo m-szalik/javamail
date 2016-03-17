@@ -2,6 +2,7 @@ package org.jsoftware.javamail;
 
 import javax.mail.*;
 import javax.mail.event.ConnectionEvent;
+import javax.mail.event.TransportEvent;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,12 +23,10 @@ abstract class AbstractDevTransport extends Transport {
         notifyConnectionListeners(ConnectionEvent.OPENED);
 	}
 
-
 	@Override
 	public boolean isConnected() {
 		return true; //it's always connected to local file system :)
 	}
-
 
 	@Override
 	public void close() throws MessagingException {
@@ -35,6 +34,11 @@ abstract class AbstractDevTransport extends Transport {
         notifyConnectionListeners(ConnectionEvent.CLOSED);
 	}
 
+    protected void fail(Message message, Address[] addresses, String msg) throws MessagingException {
+        Address[] empty = new Address[0];
+        notifyTransportListeners(TransportEvent.MESSAGE_NOT_DELIVERED, empty, addresses, empty, message);
+        throw new MessagingException(msg);
+    }
 
     /**
      * Validate FROM and RECIPIENTS
@@ -42,12 +46,12 @@ abstract class AbstractDevTransport extends Transport {
      * @param addresses addresses to be added into message if not duplicated
      * @throws MessagingException
      */
-    static void validateAndPrepare(Message message, Address[] addresses) throws MessagingException {
+    void validateAndPrepare(Message message, Address[] addresses) throws MessagingException {
         if (message.getFrom() == null || message.getFrom().length == 0) {
-            throw new MessagingException("No FROM address set!");
+            fail(message, addresses, "No FROM address set!");
         }
         if (addresses.length == 0) {
-            throw new MessagingException("No RECIPIENTS set!");
+            fail(message, addresses, "No RECIPIENTS set!");
         }
         Address[] messageAddresses = message.getAllRecipients();
         if (messageAddresses == null) {
@@ -69,7 +73,6 @@ abstract class AbstractDevTransport extends Transport {
             }
         }
     }
-
 
     /**
      * Extract parts from Multi-part message.

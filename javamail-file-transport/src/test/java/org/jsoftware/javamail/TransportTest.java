@@ -98,6 +98,7 @@ public class TransportTest {
         AbstractFileTransport transport = (AbstractFileTransport) session.getTransport("filemsg");
         transport.addTransportListener(transportListener);
         transport.sendMessage(generateMessage(), new Address[] {new InternetAddress("to@server.nowhere")});
+        Thread.sleep(200);
         verify(transportListener, times(1)).messageDelivered(any(TransportEvent.class));
     }
 
@@ -113,6 +114,7 @@ public class TransportTest {
             transport.sendMessage(message, new Address[]{new InternetAddress("to@server.nowhere")});
             Assert.fail("Exception expected");
         } catch (MessagingException ex) {
+            Thread.sleep(200);
             verify(transportListener, times(1)).messageNotDelivered(any(TransportEvent.class));
         }
     }

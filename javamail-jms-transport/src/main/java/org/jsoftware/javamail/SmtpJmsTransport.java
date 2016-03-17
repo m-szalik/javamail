@@ -69,10 +69,10 @@ public class SmtpJmsTransport extends Transport {
 	@Override
 	public void sendMessage(Message msg, Address[] addresses) throws MessagingException {
 		if (validateFrom && (msg.getFrom() == null || msg.getFrom().length == 0)) {
-			throw new MessagingException("Field FROM not set or empty!");
+			fail(msg, addresses, "Field FROM not set or empty!");
 		}
         if (addresses.length == 0) {
-            throw new MessagingException("No RECIPIENTS set!");
+            fail(msg, addresses, "No RECIPIENTS set!");
         }
 		QueueConnection queueConnection = null;
 		QueueSession queueSession = null;
@@ -114,6 +114,11 @@ public class SmtpJmsTransport extends Transport {
                 logger.warning("Problem closing JMS connection - " + jmsEx);
             }
 		}
+	}
+
+	private void fail(Message message, Address[] addresses, String msg) throws MessagingException {
+		notifyTransportListeners(TransportEvent.MESSAGE_NOT_DELIVERED, ADDRESSES_EMPTY, addresses, ADDRESSES_EMPTY, message);
+		throw new MessagingException(msg);
 	}
 
 
