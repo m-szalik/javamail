@@ -60,7 +60,7 @@ abstract class AbstractFileTransport extends AbstractDevTransport {
                 }
 			}
 		} catch (IOException e) {
-            notifyTransportListeners(TransportEvent.MESSAGE_DELIVERED, ADDRESSES_EMPTY, message.getAllRecipients(), ADDRESSES_EMPTY, message);
+            notifyTransportListeners(TransportEvent.MESSAGE_NOT_DELIVERED, ADDRESSES_EMPTY, message.getAllRecipients(), ADDRESSES_EMPTY, message);
 			throw new MessagingException("Failed to write file " + (file.getAbsolutePath()), e);
 		}
 	}
