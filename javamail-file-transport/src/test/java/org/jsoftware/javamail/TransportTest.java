@@ -3,12 +3,15 @@ package org.jsoftware.javamail;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import javax.mail.Address;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.event.TransportEvent;
+import javax.mail.event.TransportListener;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
@@ -17,11 +20,18 @@ import javax.mail.internet.MimeMultipart;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class TransportTest {
     private Address[] toAddress;
@@ -80,6 +90,31 @@ public class TransportTest {
         Assert.assertEquals(1, msgFiles.length);
         Assert.assertTrue(msgFiles[0].length() > 0);
         Assert.assertTrue(msgFiles[0].getName().endsWith(".txt"));
+    }
+
+    @Test
+    public void testListenerOnSuccess() throws Exception {
+        TransportListener transportListener = Mockito.mock(TransportListener.class);
+        AbstractFileTransport transport = (AbstractFileTransport) session.getTransport("filemsg");
+        transport.addTransportListener(transportListener);
+        transport.sendMessage(generateMessage(), new Address[] {new InternetAddress("to@server.nowhere")});
+        verify(transportListener, times(1)).messageDelivered(any(TransportEvent.class));
+    }
+
+    @Test
+    public void testListenerOnError() throws Exception {
+        TransportListener transportListener = Mockito.mock(TransportListener.class);
+        AbstractFileTransport transport = (AbstractFileTransport) session.getTransport("filemsg");
+        transport.addTransportListener(transportListener);
+        MimeMessage message = Mockito.mock(MimeMessage.class);
+        when(message.getFrom()).thenReturn(new Address[]{new InternetAddress("from@server.nowhere")});
+        doThrow(new IOException()).when(message).writeTo(any(OutputStream.class));
+        try {
+            transport.sendMessage(message, new Address[]{new InternetAddress("to@server.nowhere")});
+            Assert.fail("Exception expected");
+        } catch (MessagingException ex) {
+            verify(transportListener, times(1)).messageNotDelivered(any(TransportEvent.class));
+        }
     }
 
     /**
