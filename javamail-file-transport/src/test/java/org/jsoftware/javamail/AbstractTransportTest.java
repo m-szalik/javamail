@@ -29,9 +29,9 @@ import static org.mockito.Mockito.verify;
 /**
  * @author szalik
  */
-public class AbstractDevTransportTest {
+public class AbstractTransportTest {
     private MimeMessage message;
-    private AbstractDevTransport transport;
+    private AbstractTransport transport;
     private ConnectionListener connectionListener;
 
     @Before
@@ -42,7 +42,7 @@ public class AbstractDevTransportTest {
         message = new MimeMessage(session);
         message.setFrom("Test <test@jsoftware.org>");
         connectionListener = Mockito.mock(ConnectionListener.class);
-        transport = new AbstractDevTransport(session, new URLName("AbstractDev")) {
+        transport = new AbstractTransport(session, new URLName("AbstractDev")) {
             @Override
             public void sendMessage(Message message, Address[] addresses) throws MessagingException {
             }
@@ -87,7 +87,7 @@ public class AbstractDevTransportTest {
         part = new MimeBodyPart();
         part.setContent(multipartChild, "alternative");
         multipart.addBodyPart(part);
-        Map<String,Collection<String>> map = AbstractDevTransport.extractTextParts(multipart);
+        Map<String,Collection<String>> map = AbstractTransport.extractTextParts(multipart);
         Assert.assertEquals(1, map.size());
         System.out.println(map);
         Collection<String> content = map.get("text/plain");

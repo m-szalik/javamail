@@ -10,7 +10,7 @@ import java.util.logging.Logger;
  * @author szalik
  * @since 1.5.1
  */
-public class NopTransport extends AbstractDevTransport {
+public class NopTransport extends AbstractTransport {
     private final static Address[] ADDRESSES_EMPTY = new Address[0];
     private final Logger logger = Logger.getLogger(getClass().getName());
 

@@ -13,9 +13,9 @@ import java.util.Map;
  * {@link javax.mail.Transport} for developers
  * @author szalik
  */
-abstract class AbstractDevTransport extends Transport {
+abstract class AbstractTransport extends Transport {
 
-	AbstractDevTransport(Session session, URLName urlname) {
+	AbstractTransport(Session session, URLName urlname) {
 		super(session, urlname);
 	}
 

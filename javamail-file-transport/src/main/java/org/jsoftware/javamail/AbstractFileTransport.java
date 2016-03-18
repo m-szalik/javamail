@@ -11,7 +11,7 @@ import java.io.OutputStream;
  * {@link javax.mail.Transport} that saves messages to file using different format writers
  * @author szalik
  */
-abstract class AbstractFileTransport extends AbstractDevTransport {
+abstract class AbstractFileTransport extends AbstractTransport {
     private final static Address[] ADDRESSES_EMPTY = new Address[0];
 	private final File directory;
 
