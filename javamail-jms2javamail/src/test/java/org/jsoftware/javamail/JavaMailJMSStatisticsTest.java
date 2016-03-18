@@ -128,8 +128,18 @@ public class JavaMailJMSStatisticsTest {
         }
     }
 
+    @Test(expected = Exception.class)
+    public void testSetReadOnlyAttributes() throws Exception {
+        MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
+        AttributeList attributeList = new AttributeList();
+        Attribute attribute = new Attribute("countSuccessful", 10L);
+        attributeList.add(attribute);
+        platformMBeanServer.setAttributes(JavaMailJMSStatistics.JMX_OBJECT_NAME, attributeList);
+    }
+
     private static Object getMbeanAttribute(String attrName) throws Exception {
         MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
         return platformMBeanServer.getAttribute(JavaMailJMSStatistics.JMX_OBJECT_NAME, attrName);
     }
+
 }

@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -47,14 +48,15 @@ public class FileTxtTransport extends AbstractFileTransport {
             Object content = message.getContent();
             String body = null;
             if (content instanceof Multipart) {
-                for(Map.Entry<String,String> me : extractTextParts((Multipart) content).entrySet()) {
+                for(Map.Entry<String,Collection<String>> me : extractTextParts((Multipart) content).entrySet()) {
                     String key = me.getKey().toLowerCase();
+                    String firstText = me.getValue().iterator().next();
                     if (key.startsWith("text/plain")) {
-                        body = me.getValue();
+                        body = firstText;
                         break;
                     }
                     if (key.startsWith("text")) {
-                        body = me.getValue();
+                        body = firstText;
                     }
                 }
             } else {

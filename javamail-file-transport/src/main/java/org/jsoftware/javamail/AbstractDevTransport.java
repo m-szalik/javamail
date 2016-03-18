@@ -4,7 +4,9 @@ import javax.mail.*;
 import javax.mail.event.ConnectionEvent;
 import javax.mail.event.TransportEvent;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -31,6 +33,7 @@ abstract class AbstractDevTransport extends Transport {
 	@Override
 	public void close() throws MessagingException {
 		// do nothing, we didn't have to connect so we also do not have to disconnect.
+        notifyConnectionListeners(ConnectionEvent.DISCONNECTED);
         notifyConnectionListeners(ConnectionEvent.CLOSED);
 	}
 
@@ -81,10 +84,10 @@ abstract class AbstractDevTransport extends Transport {
      * @throws MessagingException
      * @throws IOException
      */
-    static Map<String,String> extractTextParts(Multipart multiPart) throws MessagingException, IOException {
-        HashMap<String,String> bodies = new HashMap<>();
+    static Map<String,Collection<String>> extractTextParts(Multipart multiPart) throws MessagingException, IOException {
+        HashMap<String,Collection<String>> bodies = new HashMap<>();
         for(int i = 0; i < multiPart.getCount(); i++) {
-            checkPart(bodies, multiPart.getBodyPart(i));
+            checkPartForTextType(bodies, multiPart.getBodyPart(i));
         }
         return bodies;
     }
@@ -93,14 +96,22 @@ abstract class AbstractDevTransport extends Transport {
     /**
      * Recursive find body parts and save them to HashMap
      */
-    private static void checkPart(HashMap<String, String> bodies, Part part) throws IOException, MessagingException {
+    private static void checkPartForTextType(HashMap<String, Collection<String>> bodies, Part part) throws IOException, MessagingException {
         Object content = part.getContent();
         if (content instanceof CharSequence) {
-            bodies.put(part.getContentType(), content.toString());
+            String ct = part.getContentType();
+            Collection<String> value = bodies.get(ct);
+            if (value != null) {
+                value.add(content.toString());
+            } else {
+                value = new LinkedList<>();
+                value.add(content.toString());
+                bodies.put(ct, value);
+            }
         } else if (content instanceof Multipart) {
             Multipart mp = (Multipart) content;
             for(int i = 0; i < mp.getCount(); i++) {
-                checkPart(bodies, mp.getBodyPart(i));
+                checkPartForTextType(bodies, mp.getBodyPart(i));
             }
         }
     }
