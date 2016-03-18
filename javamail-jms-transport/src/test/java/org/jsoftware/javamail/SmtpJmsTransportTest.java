@@ -70,17 +70,36 @@ public class SmtpJmsTransportTest {
     @Test(expected = MessagingException.class)
     public void testSendWithoutFrom() throws Exception {
         Message message = Mockito.mock(Message.class);
-        transport.sendMessage(message, new Address[] { new InternetAddress("text@xtest.nowhere")});
+        Address[] sendTo = new Address[] { new InternetAddress("text@xtest.nowhere") };
+        transport.sendMessage(message, sendTo);
+        Thread.sleep(200);
+        ArgumentCaptor<TransportEvent> transportEventArgumentCaptor = ArgumentCaptor.forClass(TransportEvent.class);
+        verify(transportListener, times(1)).messageNotDelivered(transportEventArgumentCaptor.capture());
+        TransportEvent event = transportEventArgumentCaptor.getValue();
+        Assert.assertEquals(message, event.getMessage());
+        Assert.assertEquals(TransportEvent.MESSAGE_NOT_DELIVERED, event.getType());
+        Assert.assertArrayEquals(new Address[0], event.getInvalidAddresses());
+        Assert.assertArrayEquals(new Address[0], event.getValidSentAddresses());
+        Assert.assertArrayEquals(sendTo, event.getValidUnsentAddresses());
+    }
+
+    @Test(expected = MessagingException.class)
+    public void testSendWitEmptyFrom() throws Exception {
+        Message message = Mockito.mock(Message.class);
+        when(message.getFrom()).thenReturn(new Address[0]);
+        transport.sendMessage(message, new Address[] { new InternetAddress("text@xtest.nowhere") });
+        Thread.sleep(200);
+        verify(transportListener, times(1)).messageNotDelivered(any(TransportEvent.class));
     }
 
     @Test
     public void testSend() throws Exception {
-        final InternetAddress toAddr =  new InternetAddress("text@xtest.nowhere");
+        final Address[] sendTo = new Address[] { new InternetAddress("text@xtest.nowhere") };
         Message message = Mockito.mock(Message.class);
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[]{"low"});
         when(message.getFrom()).thenReturn(new Address[] { new InternetAddress("from@server.com") });
         when(message.getSubject()).thenReturn("msgSubject!");
-        transport.sendMessage(message, new Address[] { toAddr });
+        transport.sendMessage(message, sendTo);
         ArgumentCaptor<byte[]> bytesCaptor = ArgumentCaptor.forClass(byte[].class);
         verify(bytesMessage, times(1)).writeBytes(bytesCaptor.capture());
         byte[] messageBuffer = bytesCaptor.getValue();
@@ -89,11 +108,17 @@ public class SmtpJmsTransportTest {
         String protocol = input.readUTF();
         Address[] inAddr = (Address[]) input.readObject();
         Assert.assertEquals(1, inAddr.length);
-        Assert.assertEquals(toAddr, inAddr[0]);
+        Assert.assertArrayEquals(sendTo, inAddr);
         Assert.assertEquals("smtp", protocol);
         verify(message, times(1)).writeTo(any(ObjectOutputStream.class));
         Thread.sleep(200);
-        verify(transportListener, times(1)).messageDelivered(any(TransportEvent.class));
+        ArgumentCaptor<TransportEvent> transportEventArgumentCaptor = ArgumentCaptor.forClass(TransportEvent.class);
+        verify(transportListener, times(1)).messageDelivered(transportEventArgumentCaptor.capture());
+        TransportEvent event = transportEventArgumentCaptor.getValue();
+        Assert.assertEquals(message, event.getMessage());
+        Assert.assertArrayEquals(new Address[0], event.getInvalidAddresses());
+        Assert.assertArrayEquals(sendTo, event.getValidSentAddresses());
+        Assert.assertArrayEquals(new Address[0], event.getValidUnsentAddresses());
     }
 
     @Test
