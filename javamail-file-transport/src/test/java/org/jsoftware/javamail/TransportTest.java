@@ -1,5 +1,6 @@
 package org.jsoftware.javamail;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,13 +22,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -68,14 +67,38 @@ public class TransportTest {
 	public void transportTxtTest() throws MessagingException, IOException, NoSuchAlgorithmException {
 		AbstractFileTransport transport = (AbstractFileTransport) session.getTransport("filetxt");
         transport.writeMessage(generateMessage(), outputStream);
-        org.junit.Assert.assertEquals("10e5c47d151c47ef62c23ca998d1b55a", md5sumFromOutput());
+        String fileContent = new String(outputStream.toByteArray());
+        org.junit.Assert.assertEquals(fileContent, IOUtils.toString(getClass().getResourceAsStream("transportTest-expected.txt"), "UTF-8"));
 	}
 
     @Test
     public void transportMsgTest() throws MessagingException, IOException, NoSuchAlgorithmException {
         AbstractFileTransport transport = (AbstractFileTransport) session.getTransport("filemsg");
         transport.writeMessage(generateMessage(), outputStream);
-        org.junit.Assert.assertEquals("f351530889938d0625739a37bab0b992", md5sumFromOutput());
+        String fileContent = new String(outputStream.toByteArray());
+        org.junit.Assert.assertEquals(normalizeContent(fileContent), normalizeContent(IOUtils.toString(getClass().getResourceAsStream("transportTest-expected.msg"), "UTF-8")));
+    }
+
+    private static String normalizeContent(String input) {
+        Pattern trimTailPattern = Pattern.compile("[ \t]+$");
+        StringBuilder sb = new StringBuilder();
+        for(String line : input.split("\n")) {
+            line = trimTailPattern.matcher(line).replaceAll("");
+            if (line.startsWith("Message-ID:")) {
+                sb.append("Message-ID: testID\n");
+                continue;
+            }
+            if (line.startsWith("\tboundary=")) {
+                sb.append("\tboundary=\"tb\"\n");
+                continue;
+            }
+            if (line.startsWith("------=_Part")) {
+                sb.append("------=_Part_XYZ--\n");
+                continue;
+            }
+            sb.append(line).append('\n');
+        }
+        return sb.toString().replaceAll("\r", "");
     }
 
     @Test
@@ -142,19 +165,5 @@ public class TransportTest {
         return msg;
     }
 
-
-    private String md5sumFromOutput() throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        String content = new String(outputStream.toByteArray(), "UTF-8");
-        MessageDigest m = MessageDigest.getInstance("MD5");
-        m.reset();
-        for(String l : content.split("\n")) {
-            if (! l.startsWith("Date:") && ! l.startsWith("Message-ID:") && ! l.contains("Part")) {
-                m.update(l.getBytes());
-            }
-        }
-        byte[] digest = m.digest();
-        BigInteger bigInt = new BigInteger(1, digest);
-        return bigInt.toString(16);
-    }
 }
 

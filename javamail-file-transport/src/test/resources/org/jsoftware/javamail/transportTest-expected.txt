@@ -1,0 +1,5 @@
+From: Test <from@test.com>
+Subject: subject
+X-Custom-Header: CustomValue
+
+Body's text (text)
