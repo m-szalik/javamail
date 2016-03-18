@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 /**
  * This transport only adds info about an email to logs.
+ * It applies validation on the email so if there is missing address or missing From header it will fail.
  * @author szalik
  * @since 1.5.1
  */

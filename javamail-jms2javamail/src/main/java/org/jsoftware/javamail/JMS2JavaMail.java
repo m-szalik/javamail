@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 /**
  * Get javax.mail.Message (bytes) from JMS queue and send it using required Transport.
- * <p>A required protocol is a part of JMS message</p>
+ * <p>A required protocol is a part of JMS message.</p>
  * See SmtpJmsTransport class
  */
 @MessageDriven(mappedName = "jms/mailQueue", name = "mailQueue")

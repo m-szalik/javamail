@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {@link javax.mail.Transport} Saves mail as text - only headers and text part of multi-part is saved
+ * {@link javax.mail.Transport} Saves mail as text - only headers and text/plain part of multi-part is saved.
  * @author szalik
  * @since 1.5.1
  */

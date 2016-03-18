@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 /**
- * {@link javax.mail.Transport} for developers
+ * Abstract transport that contains some helper methods.
  * @author szalik
  */
 abstract class AbstractTransport extends Transport {
