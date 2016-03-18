@@ -94,7 +94,7 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
         try {
             platformMBeanServer.unregisterMBean(JMX_OBJECT_NAME);
         } catch (Exception e) {
-            throw new IllegalStateException("Problem during unregistration of JavaMailStatistics from JMX:" + e, e);
+            throw new IllegalStateException("Unable to unregister MBean 'JavaMailStatistics' from JMX:" + e, e);
         }
     }
 
@@ -192,7 +192,7 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
     @Override
     public Object getAttribute(String attribute) throws AttributeNotFoundException, MBeanException, ReflectionException {
         if ("statisticsCollectionStartDate".equalsIgnoreCase(attribute)) {
-            return startDate;
+            return startDate == null ? null : new Date(startDate.getTime());
         }
         if ("lastSuccessfulMailInfo".equalsIgnoreCase(attribute)) {
             return convert(lastSuccessMessage);
@@ -233,7 +233,7 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
     public Object invoke(String actionName, Object[] params, String[] signature) throws MBeanException, ReflectionException {
         if ("reset".equalsIgnoreCase(actionName)) {
             reset();
-            return startDate;
+            return startDate == null ? null : new Date(startDate.getTime());
         }
         return null;
     }

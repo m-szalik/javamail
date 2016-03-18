@@ -145,7 +145,8 @@ public class SmtpJmsTransport extends Transport {
 			oos.writeObject(addresses == null ? new Address[0] : addresses);
 			msg.writeTo(oos);
 		} catch (IOException e) {
-			throw new MessagingException("Could not send JMS message with mail content for Message-ID:" + msg.getHeader("Message-ID"), e);
+			String[] messageId = msg.getHeader("Message-ID");
+			throw new MessagingException("Could not send JMS message with mail content for Message-ID:" + (messageId != null && messageId.length > 0 ? messageId[0] : "NOT_SET") , e);
 		}
 		jms.writeBytes(baos.toByteArray());
 		Integer priority = jmsPriority(msg);

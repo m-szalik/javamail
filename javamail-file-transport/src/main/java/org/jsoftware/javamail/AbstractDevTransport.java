@@ -34,7 +34,7 @@ abstract class AbstractDevTransport extends Transport {
         notifyConnectionListeners(ConnectionEvent.CLOSED);
 	}
 
-    protected void fail(Message message, Address[] addresses, String msg) throws MessagingException {
+    private void fail(Message message, Address[] addresses, String msg) throws MessagingException {
         Address[] empty = new Address[0];
         notifyTransportListeners(TransportEvent.MESSAGE_NOT_DELIVERED, empty, addresses, empty, message);
         throw new MessagingException(msg);

@@ -146,15 +146,15 @@ public class SmtpJmsTransportTest {
 
     @Test
     public void testSendNumberPriorityXPriority() throws Exception {
-        final int prio = 4;
+        final int priority = 4;
         Message message = Mockito.mock(Message.class);
-        when(message.getHeader(eq("X-Priority"))).thenReturn(new String[]{Integer.toString(prio)});
+        when(message.getHeader(eq("X-Priority"))).thenReturn(new String[]{Integer.toString(priority)});
         when(message.getFrom()).thenReturn(new Address[] { new InternetAddress("from@server.com") });
         transport.sendMessage(message, new Address[] { new InternetAddress("text@xtest.nowhere") });
         ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
         verify(bytesMessage, times(1)).setJMSPriority(captor.capture());
         Integer jmsPriority = captor.getValue();
-        Assert.assertEquals(prio, jmsPriority.intValue());
+        Assert.assertEquals(priority, jmsPriority.intValue());
     }
 
     @Test

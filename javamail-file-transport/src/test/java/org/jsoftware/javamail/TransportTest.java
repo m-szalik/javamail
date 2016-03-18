@@ -26,6 +26,8 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -48,7 +50,9 @@ public class TransportTest {
             File[] files = outDir.listFiles();
             if (files != null) {
                 for (File f : files) {
-                    f.delete();
+                    if (! f.delete()) {
+                        Logger.getLogger(getClass().getName()).log(Level.WARNING, "Unable to delete test file " + f.getAbsolutePath());
+                    }
                 }
             }
         }

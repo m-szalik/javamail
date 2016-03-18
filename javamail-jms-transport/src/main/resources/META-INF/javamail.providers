@@ -2,7 +2,7 @@
 protocol=smtpjms; type=transport; class=org.jsoftware.javamail.SmtpJmsTransport; vendor=Jsoftware.org;
 
 
-#Include also default providres
+#Include also default provides
 # JavaMail IMAP provider Sun Microsystems, Inc
 protocol=imap; type=store; class=com.sun.mail.imap.IMAPStore; vendor=Sun Microsystems, Inc;
 protocol=imaps; type=store; class=com.sun.mail.imap.IMAPSSLStore; vendor=Sun Microsystems, Inc;

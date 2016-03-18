@@ -56,7 +56,7 @@ _SMTP or other (this will be used for real messages sending)_
 ## Extra mail features supported by JMS Transport:
 You can set some special message headers:
 * **X-Send-priority**	sending priority witch is jms message priority (0-9) or "low"=1 or "high"=8
-* **X-Send-expire**		sending timeout in ms. Message will be not send if it wasn't sent before timeout.
+* **X-Send-expire**		sending timeout in ms. Message will be not send if it was not sent before timeout.
 
 
 

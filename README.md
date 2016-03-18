@@ -15,7 +15,7 @@ Allows sending emails form your application using java.mail.Session to a file th
 
 
 ### For admins:
-Allows also sending emails using java.mail.Session to JMS queue and than via SMTP. This solutions seeds up sending process because it doesn't require to connect to real smtp server.
+Allows also sending emails using java.mail.Session to JMS queue and than via SMTP. This solutions seeds up sending process because it does not require to connect to real smtp server.
 It can be deployed on application server (as default mailSession) and it's completely transparent for applications.
 You can choose transport one of:
 * **filemsg** = emails are saved to files in mbox format
