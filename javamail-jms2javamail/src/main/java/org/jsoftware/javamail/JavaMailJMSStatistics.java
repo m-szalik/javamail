@@ -244,7 +244,11 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
     }
 }
 
-
+/**
+ * This is ValueObject for last successfully send message and last fail message.
+ * @see JavaMailJMSStatistics
+ * @author szalik
+ */
 class MessageAndAddresses {
     private final MimeMessage message;
     private final Address[] addresses;

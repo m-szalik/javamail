@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * {@link Transport} Saves whole mail as msg (mbox format)
+ * {@link Transport} Saves entire email as msg file (mbox format)
  * @author szalik
  */
 public class FileMsgTransport extends AbstractFileTransport {
