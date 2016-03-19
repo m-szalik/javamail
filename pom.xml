@@ -11,11 +11,6 @@
 	    <version>1.7.1</version>
 	</parent>
 
-    <properties>
-        <javamail.version>1.5.5</javamail.version>
-    </properties>
-
-	
 	<url>https://github.com/m-szalik/javamail/wiki</url>
 	<name>JavaMail extensions for javaMail 1.5.5 (jdk7).</name>
 
@@ -27,6 +22,9 @@
         </license>
     </licenses>
 
+    <properties>
+        <javamail.version>1.5.5</javamail.version> <!-- this is for jetty example only -->
+    </properties>
 
     <dependencies>
         <dependency>
@@ -58,13 +56,23 @@
             <dependency>
                 <groupId>javax.mail</groupId>
                 <artifactId>javax.mail-api</artifactId>
-                <version>${javamail.version}</version>
-                <scope>provided</scope>
+                <version>1.5.5</version> <!-- cannot use ${javamail.version} variable here because VersionEye doesn't support that -->
+            </dependency>
+            <!-- test and examples sub-projects dependencies below -->
+            <dependency>
+                <groupId>com.sun.mail</groupId>
+                <artifactId>javax.mail</artifactId>
+                <version>1.5.5</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
                 <version>1.10.19</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
