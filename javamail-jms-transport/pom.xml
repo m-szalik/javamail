@@ -12,7 +12,14 @@
 	<url>http://jsoftware.org</url>
 	<name>JavaMail JMS File Transport.</name>
 	<description>JavaMail Transport for smtpjms protocol. This protocol saves messages into jms queue (jndi jms/mailQueue).</description>
-	
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 	<dependencies>
 	    <dependency>
