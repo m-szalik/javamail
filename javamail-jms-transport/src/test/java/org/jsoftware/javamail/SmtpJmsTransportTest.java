@@ -67,30 +67,64 @@ public class SmtpJmsTransportTest {
         transport.addTransportListener(transportListener);
     }
 
-    @Test(expected = MessagingException.class)
+    @Test
     public void testSendWithoutFrom() throws Exception {
         Message message = Mockito.mock(Message.class);
         Address[] sendTo = new Address[] { new InternetAddress("text@xtest.nowhere") };
-        transport.sendMessage(message, sendTo);
-        Thread.sleep(200);
-        ArgumentCaptor<TransportEvent> transportEventArgumentCaptor = ArgumentCaptor.forClass(TransportEvent.class);
-        verify(transportListener, times(1)).messageNotDelivered(transportEventArgumentCaptor.capture());
-        TransportEvent event = transportEventArgumentCaptor.getValue();
-        Assert.assertEquals(message, event.getMessage());
-        Assert.assertEquals(TransportEvent.MESSAGE_NOT_DELIVERED, event.getType());
-        Assert.assertArrayEquals(new Address[0], event.getInvalidAddresses());
-        Assert.assertArrayEquals(new Address[0], event.getValidSentAddresses());
-        Assert.assertArrayEquals(sendTo, event.getValidUnsentAddresses());
+        try {
+            transport.sendMessage(message, sendTo);
+            Assert.fail();
+        } catch (MessagingException ex) {
+            Thread.sleep(200);
+            ArgumentCaptor<TransportEvent> transportEventArgumentCaptor = ArgumentCaptor.forClass(TransportEvent.class);
+            verify(transportListener, times(1)).messageNotDelivered(transportEventArgumentCaptor.capture());
+            TransportEvent event = transportEventArgumentCaptor.getValue();
+            Assert.assertEquals(message, event.getMessage());
+            Assert.assertEquals(TransportEvent.MESSAGE_NOT_DELIVERED, event.getType());
+            Assert.assertArrayEquals(new Address[0], event.getInvalidAddresses());
+            Assert.assertArrayEquals(new Address[0], event.getValidSentAddresses());
+            Assert.assertArrayEquals(sendTo, event.getValidUnsentAddresses());
+        }
     }
 
-    @Test(expected = MessagingException.class)
+    @Test
     public void testSendWitEmptyFrom() throws Exception {
         Message message = Mockito.mock(Message.class);
         when(message.getFrom()).thenReturn(new Address[0]);
-        transport.sendMessage(message, new Address[] { new InternetAddress("text@xtest.nowhere") });
-        Thread.sleep(200);
-        verify(transportListener, times(1)).messageNotDelivered(any(TransportEvent.class));
+        try {
+            transport.sendMessage(message, new Address[]{new InternetAddress("text@xtest.nowhere")});
+            Assert.fail();
+        } catch (MessagingException ex) {
+            Thread.sleep(200);
+            verify(transportListener, times(1)).messageNotDelivered(any(TransportEvent.class));
+        }
     }
+
+
+    @Test
+    public void testDoNotCheckFormHeader() throws Exception {
+        Properties properties = new Properties();
+        properties.setProperty("mail.smtpjms.validateFrom", "false");
+        SmtpJmsTransport transport = new SmtpJmsTransport(Session.getInstance(properties), new URLName("jms"));
+        Message message = Mockito.mock(Message.class);
+        transport.sendMessage(message, new Address[]{new InternetAddress("text@xtest.nowhere")});
+        // no exception = ok
+    }
+
+
+    @Test
+    public void testNoAddresses() throws Exception {
+        Message message = Mockito.mock(Message.class);
+        when(message.getFrom()).thenReturn(new Address[] { new InternetAddress("from@server.nowhere") });
+        try {
+            transport.sendMessage(message, new Address[]{}); // empty address list
+            Assert.fail();
+        } catch (MessagingException ex) {
+            Thread.sleep(200);
+            verify(transportListener, times(1)).messageNotDelivered(any(TransportEvent.class));
+        }
+    }
+
 
     @Test
     public void testSend() throws Exception {
