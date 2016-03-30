@@ -128,6 +128,17 @@ public class JavaMailJMSStatisticsTest {
         }
     }
 
+    @Test
+    public void testGetAttributesEmpty() throws Exception {
+        AttributeList attributeList = javaMailJMSStatistics.getAttributes(new String[0]);
+        Assert.assertEquals(0, attributeList.size());
+    }
+
+    @Test(expected = Exception.class)
+    public void testGetAttributesNotFound() throws Exception {
+        javaMailJMSStatistics.getAttributes(new String[] {"NotExistingProperty"});
+    }
+
     @Test(expected = Exception.class)
     public void testSetReadOnlyAttributes() throws Exception {
         MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
