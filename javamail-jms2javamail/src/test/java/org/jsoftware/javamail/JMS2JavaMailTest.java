@@ -137,4 +137,10 @@ public class JMS2JavaMailTest {
         verify(textMessage, times(1)).acknowledge();
     }
 
+
+    @Test(expected = IllegalStateException.class)
+    public void testCheckForNullSession() throws Exception {
+        JMS2JavaMail jms2JavaMail = new JMS2JavaMail();
+        jms2JavaMail.init();
+    }
 }

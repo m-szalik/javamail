@@ -23,8 +23,10 @@ import javax.mail.event.TransportListener;
 import javax.mail.internet.InternetAddress;
 import javax.naming.Context;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.Properties;
 
 import static org.mockito.Matchers.any;
@@ -219,8 +221,8 @@ public class SmtpJmsTransportTest {
         try {
             transport.sendMessage(message, new Address[]{new InternetAddress("text@xtest.nowhere")});
         } catch (MessagingException ex) {
-            Thread.sleep(500);
-            verify(transportListener, times(1)).messageNotDelivered(any(TransportEvent.class));
+            Thread.sleep(200);
+            verify(transportListener).messageNotDelivered(any(TransportEvent.class));
         }
     }
 
@@ -229,6 +231,20 @@ public class SmtpJmsTransportTest {
         Properties properties = new Properties();
         properties.setProperty("mail.smtpjms.dstProtocol", "notExistingOne");
         new SmtpJmsTransport(Session.getInstance(properties), new URLName("jms"));
+    }
+
+    @Test(expected = MessagingException.class)
+    public void testErrorWritingMessage() throws Exception {
+        Message message = Mockito.mock(Message.class);
+        when(message.getFrom()).thenReturn(new Address[] { new InternetAddress("from@server.com") });
+        when(message.getHeader(eq("Message-ID"))).thenReturn(new String[] {"mockMID"});
+        doThrow(new IOException("mock")).when(message).writeTo(any(OutputStream.class));
+        try {
+            transport.sendMessage(message, new Address[]{new InternetAddress("text@xtest.nowhere")});
+        } finally {
+            Thread.sleep(200);
+            verify(transportListener).messageNotDelivered(any(TransportEvent.class));
+        }
     }
 
     @Test

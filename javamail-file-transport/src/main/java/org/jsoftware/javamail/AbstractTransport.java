@@ -51,7 +51,7 @@ abstract class AbstractTransport extends Transport {
      */
     void validateAndPrepare(Message message, Address[] addresses) throws MessagingException {
         if (message.getFrom() == null || message.getFrom().length == 0) {
-            fail(message, addresses, "No FROM address set!");
+            fail(message, addresses, "No or empty FROM address set!");
         }
         if (addresses.length == 0) {
             fail(message, addresses, "No RECIPIENTS set!");

@@ -12,6 +12,8 @@ import javax.mail.Session;
 import javax.mail.URLName;
 import javax.mail.event.ConnectionEvent;
 import javax.mail.event.ConnectionListener;
+import javax.mail.event.TransportEvent;
+import javax.mail.event.TransportListener;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -33,6 +35,7 @@ public class AbstractTransportTest {
     private MimeMessage message;
     private AbstractTransport transport;
     private ConnectionListener connectionListener;
+    private TransportListener transportListener;
 
     @Before
     public void setup() throws MessagingException, IOException {
@@ -42,12 +45,15 @@ public class AbstractTransportTest {
         message = new MimeMessage(session);
         message.setFrom("Test <test@jsoftware.org>");
         connectionListener = Mockito.mock(ConnectionListener.class);
+        transportListener = Mockito.mock(TransportListener.class);
         transport = new AbstractTransport(session, new URLName("AbstractDev")) {
             @Override
             public void sendMessage(Message message, Address[] addresses) throws MessagingException {
+                validateAndPrepare(message, addresses);
             }
         };
         transport.addConnectionListener(connectionListener);
+        transport.addTransportListener(transportListener);
     }
 
     @Test(expected = MessagingException.class)
@@ -89,7 +95,6 @@ public class AbstractTransportTest {
         multipart.addBodyPart(part);
         Map<String,Collection<String>> map = AbstractTransport.extractTextParts(multipart);
         Assert.assertEquals(1, map.size());
-        System.out.println(map);
         Collection<String> content = map.get("text/plain");
         Assert.assertNotNull(map);
         Assert.assertArrayEquals(new String[] {"Text 1", "Text 2", "Text 3"}, content.toArray());
@@ -102,7 +107,29 @@ public class AbstractTransportTest {
         verify(connectionListener, times(1)).opened(any(ConnectionEvent.class));
         transport.close();
         Thread.sleep(200);
-        verify(connectionListener, times(1)).disconnected(any(ConnectionEvent.class));
-        verify(connectionListener, times(1)).closed(any(ConnectionEvent.class));
+        verify(connectionListener).disconnected(any(ConnectionEvent.class));
+        verify(connectionListener).closed(any(ConnectionEvent.class));
+    }
+
+    @Test(expected = MessagingException.class)
+    public void testNoFromNull() throws Exception {
+        try {
+            message.setFrom((String) null);
+            transport.validateAndPrepare(message, new Address[]{});
+        } finally {
+            Thread.sleep(200);
+            verify(transportListener).messageNotDelivered(any(TransportEvent.class));
+        }
+    }
+
+    @Test(expected = MessagingException.class)
+    public void testNoFromEmpty() throws Exception {
+        try {
+            message.setFrom("");
+            transport.validateAndPrepare(message, new Address[]{});
+        } finally {
+            Thread.sleep(200);
+            verify(transportListener).messageNotDelivered(any(TransportEvent.class));
+        }
     }
 }

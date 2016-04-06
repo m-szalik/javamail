@@ -90,7 +90,12 @@ public class SmtpJmsTransport extends Transport {
 			}
 			queueConnection.start();
 			queueSender.setDeliveryMode(jmsDeliveryMode);
-			queueSender.send(createJmsMessage(queueSession, msg, addresses));
+			try {
+				queueSender.send(createJmsMessage(queueSession, msg, addresses));
+			} catch (MessagingException ex) {
+				notifyTransportListeners(TransportEvent.MESSAGE_NOT_DELIVERED, ADDRESSES_EMPTY, addresses, ADDRESSES_EMPTY, msg);
+				throw ex;
+			}
             if (logger.isLoggable(Level.INFO)) {
                 logger.log(Level.INFO, "Message " + msg.getMessageNumber() + " sent to JMS queue.");
             }
