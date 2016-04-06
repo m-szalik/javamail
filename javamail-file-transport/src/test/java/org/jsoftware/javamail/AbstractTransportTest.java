@@ -122,14 +122,4 @@ public class AbstractTransportTest {
         }
     }
 
-    @Test(expected = MessagingException.class)
-    public void testNoFromEmpty() throws Exception {
-        try {
-            message.setFrom("");
-            transport.validateAndPrepare(message, new Address[]{});
-        } finally {
-            Thread.sleep(200);
-            verify(transportListener).messageNotDelivered(any(TransportEvent.class));
-        }
-    }
 }
