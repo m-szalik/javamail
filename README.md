@@ -5,6 +5,7 @@ javaMail extensions
 [![Build Status](https://travis-ci.org/m-szalik/javamail.svg?branch=master)](https://travis-ci.org/m-szalik/javamail)
 [![codecov.io](https://codecov.io/github/m-szalik/javamail/coverage.svg?branch=master)](https://codecov.io/github/m-szalik/javamail?branch=master)
 [![Dependency Status](https://www.versioneye.com/user/projects/56ee9d6b35630e00388895da/badge.svg?style=flat)](https://www.versioneye.com/user/projects/56ee9d6b35630e00388895da)
+[![Codacy Badge](https://api.codacy.com/project/badge/grade/de4992c46d644e2eb23a8ae654ade8d4)](https://www.codacy.com/app/szalik/javamail)
 
 ### More info on Wiki
 https://github.com/m-szalik/javamail/wiki
