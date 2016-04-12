@@ -1,6 +1,11 @@
 package org.jsoftware.javamail;
 
-import javax.mail.*;
+import javax.mail.Header;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.URLName;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;

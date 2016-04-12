@@ -9,7 +9,18 @@ import javax.mail.Header;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.management.*;
-import javax.management.openmbean.*;
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.OpenDataException;
+import javax.management.openmbean.OpenMBeanAttributeInfoSupport;
+import javax.management.openmbean.OpenMBeanOperationInfoSupport;
+import javax.management.openmbean.OpenMBeanParameterInfo;
+import javax.management.openmbean.OpenType;
+import javax.management.openmbean.SimpleType;
+import javax.management.openmbean.TabularData;
+import javax.management.openmbean.TabularDataSupport;
+import javax.management.openmbean.TabularType;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.management.ManagementFactory;
@@ -71,9 +82,9 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
                     new MBeanNotificationInfo[] { new MBeanNotificationInfo(new String[]{"JavaMail-Send-Success", "JavaMail-Send-Failure"}, "mail-events", "Info about emails that has been sent.") }
             );
         } catch (OpenDataException e) {
-            throw new RuntimeException("Cannot create openTypes", e);
+            throw new AssertionError("Cannot create openTypes", e);
         } catch (MalformedObjectNameException e) {
-            throw new RuntimeException("Cannot create JMX Object Name", e);
+            throw new AssertionError("Cannot create JMX Object Name", e);
         }
     }
 
@@ -85,7 +96,7 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
             platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
             platformMBeanServer.registerMBean(this, JMX_OBJECT_NAME);
         } catch (Exception e) {
-            throw new IllegalStateException("Problem during registration of JavaMailStatistics into JMX:" + e, e);
+            throw new AssertionError("Problem during registration of JavaMailStatistics into JMX:" + e, e);
         }
     }
 
@@ -94,7 +105,7 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
         try {
             platformMBeanServer.unregisterMBean(JMX_OBJECT_NAME);
         } catch (Exception e) {
-            throw new IllegalStateException("Unable to unregister MBean 'JavaMailStatistics' from JMX:" + e, e);
+            throw new AssertionError("Unable to unregister MBean 'JavaMailStatistics' from JMX:" + e, e);
         }
     }
 

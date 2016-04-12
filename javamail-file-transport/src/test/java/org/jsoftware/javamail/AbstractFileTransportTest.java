@@ -9,7 +9,6 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.URLName;
-import javax.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -22,19 +21,17 @@ import java.util.Properties;
 public class AbstractFileTransportTest {
     private final static String BASE_NAME = "base-name";
     private final static String BASE_EXT = "ext";
-    private MimeMessage message;
     private AbstractFileTransport transport;
 
     @Before
-    public void setup() throws MessagingException, IOException {
+    public void setUp() throws MessagingException, IOException {
         Properties properties = new Properties();
         properties.put("mail.files.path", "target" + File.separatorChar + "output");
         Session session = Session.getDefaultInstance(properties);
-        message = new MimeMessage(session);
-        message.setFrom("Test <test@jsoftware.org>");
         transport = new AbstractFileTransport(session, new URLName("AbstractFileDev")) {
             @Override
             protected void writeMessage(Message message, OutputStream os) throws IOException, MessagingException {
+                // do nothing
             }
             @Override
             protected String getFilenameExtension() {

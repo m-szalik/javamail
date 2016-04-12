@@ -1,10 +1,21 @@
 package org.jsoftware.javamail;
 
 
-import javax.jms.*;
-import javax.mail.*;
+import javax.jms.BytesMessage;
+import javax.jms.DeliveryMode;
+import javax.jms.JMSException;
+import javax.jms.Queue;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+import javax.jms.QueueSender;
+import javax.jms.QueueSession;
+import javax.mail.Address;
 import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.URLName;
 import javax.mail.event.TransportEvent;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -46,7 +57,7 @@ public class SmtpJmsTransport extends Transport {
 			queueConnectionFactory = (QueueConnectionFactory) initialContext.lookup(getProperty(session, "jmsQueueConnectionFactory", "jms/queueConnectionFactory"));
 			mailQueue = (Queue) initialContext.lookup(getProperty(session, "jmsQueue", "jms/mailQueue"));
 		} catch (NamingException e) {
-			throw new RuntimeException("Cannot create SmtpJmsTransport.", e);
+			throw new TransportCreationException("Cannot create SmtpJmsTransport.", e);
 		}
 		String str = getProperty(session, "validateFrom", "true");
 		validateFrom = Boolean.valueOf(str);

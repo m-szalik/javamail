@@ -28,6 +28,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -41,7 +44,7 @@ public class TransportTest {
     private File outDir;
 
     @Before
-    public void setup() throws AddressException, IOException {
+    public void setUp() throws AddressException, IOException {
         String outDirName = "target/output";
         Properties properties = new Properties();
         outDir = new File(outDirName);
@@ -68,7 +71,7 @@ public class TransportTest {
 		AbstractFileTransport transport = (AbstractFileTransport) session.getTransport("filetxt");
         transport.writeMessage(generateMessage(), outputStream);
         String fileContent = new String(outputStream.toByteArray());
-        org.junit.Assert.assertEquals(fileContent, IOUtils.toString(getClass().getResourceAsStream("transportTest-expected.txt"), "UTF-8"));
+        assertEquals(fileContent, IOUtils.toString(getClass().getResourceAsStream("transportTest-expected.txt"), "UTF-8"));
 	}
 
     @Test
@@ -76,7 +79,7 @@ public class TransportTest {
         AbstractFileTransport transport = (AbstractFileTransport) session.getTransport("filemsg");
         transport.writeMessage(generateMessage(), outputStream);
         String fileContent = new String(outputStream.toByteArray());
-        org.junit.Assert.assertEquals(normalizeContent(fileContent), normalizeContent(IOUtils.toString(getClass().getResourceAsStream("transportTest-expected.msg"), "UTF-8")));
+        assertEquals(normalizeContent(fileContent), normalizeContent(IOUtils.toString(getClass().getResourceAsStream("transportTest-expected.msg"), "UTF-8")));
     }
 
     private static String normalizeContent(String input) {
@@ -113,10 +116,10 @@ public class TransportTest {
         MimeMessage message = generateMessage();
         transport.sendMessage(message, toAddress);
         File[] msgFiles = outDir.listFiles();
-        Assert.assertNotNull(msgFiles);
-        Assert.assertEquals(1, msgFiles.length);
-        Assert.assertTrue(msgFiles[0].length() > 0);
-        Assert.assertTrue(msgFiles[0].getName().endsWith(".txt"));
+        assertNotNull(msgFiles);
+        assertEquals(1, msgFiles.length);
+        assertTrue(msgFiles[0].length() > 0);
+        assertTrue(msgFiles[0].getName().endsWith(".txt"));
     }
 
     @Test
@@ -166,4 +169,3 @@ public class TransportTest {
     }
 
 }
-

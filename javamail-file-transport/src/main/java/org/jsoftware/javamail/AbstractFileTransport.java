@@ -1,6 +1,10 @@
 package org.jsoftware.javamail;
 
-import javax.mail.*;
+import javax.mail.Address;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.URLName;
 import javax.mail.event.TransportEvent;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,10 +26,8 @@ abstract class AbstractFileTransport extends AbstractTransport {
 		super(session, urlname);
 		String s = session.getProperties().getProperty("mail.files.path", ".");
 		directory = new File(s);
-		if (! directory.exists()) {
-			if (! directory.mkdirs()) {
-				throw new IllegalArgumentException("Unable to create output directory " + directory.getAbsolutePath());
-			}
+		if (! directory.exists() && ! directory.mkdirs()) {
+            throw new IllegalArgumentException("Unable to create output directory " + directory.getAbsolutePath());
 		}
 	}
 

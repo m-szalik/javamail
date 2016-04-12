@@ -29,6 +29,8 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
@@ -75,14 +77,14 @@ public class SmtpJmsTransportTest {
         Address[] sendTo = new Address[] { new InternetAddress("text@xtest.nowhere") };
         try {
             transport.sendMessage(message, sendTo);
-            Assert.fail();
+            fail();
         } catch (MessagingException ex) {
             Thread.sleep(200);
             ArgumentCaptor<TransportEvent> transportEventArgumentCaptor = ArgumentCaptor.forClass(TransportEvent.class);
             verify(transportListener, times(1)).messageNotDelivered(transportEventArgumentCaptor.capture());
             TransportEvent event = transportEventArgumentCaptor.getValue();
-            Assert.assertEquals(message, event.getMessage());
-            Assert.assertEquals(TransportEvent.MESSAGE_NOT_DELIVERED, event.getType());
+            assertEquals(message, event.getMessage());
+            assertEquals(TransportEvent.MESSAGE_NOT_DELIVERED, event.getType());
             Assert.assertArrayEquals(new Address[0], event.getInvalidAddresses());
             Assert.assertArrayEquals(new Address[0], event.getValidSentAddresses());
             Assert.assertArrayEquals(sendTo, event.getValidUnsentAddresses());
@@ -95,7 +97,7 @@ public class SmtpJmsTransportTest {
         when(message.getFrom()).thenReturn(new Address[0]);
         try {
             transport.sendMessage(message, new Address[]{new InternetAddress("text@xtest.nowhere")});
-            Assert.fail();
+            fail();
         } catch (MessagingException ex) {
             Thread.sleep(200);
             verify(transportListener, times(1)).messageNotDelivered(any(TransportEvent.class));
@@ -104,13 +106,18 @@ public class SmtpJmsTransportTest {
 
 
     @Test
-    public void testDoNotCheckFormHeader() throws Exception {
-        Properties properties = new Properties();
-        properties.setProperty("mail.smtpjms.validateFrom", "false");
-        SmtpJmsTransport transport = new SmtpJmsTransport(Session.getInstance(properties), new URLName("jms"));
-        Message message = Mockito.mock(Message.class);
-        transport.sendMessage(message, new Address[]{new InternetAddress("text@xtest.nowhere")});
-        // no exception = ok
+    public void testDoNotCheckFormHeader() {
+        try {
+            Properties properties = new Properties();
+            properties.setProperty("mail.smtpjms.validateFrom", "false");
+            SmtpJmsTransport transport = new SmtpJmsTransport(Session.getInstance(properties), new URLName("jms"));
+            Message message = Mockito.mock(Message.class);
+            transport.sendMessage(message, new Address[]{new InternetAddress("text@xtest.nowhere")});
+            // no exception = ok
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            fail("An exception - " + ex);
+        }
     }
 
 
@@ -120,7 +127,7 @@ public class SmtpJmsTransportTest {
         when(message.getFrom()).thenReturn(new Address[] { new InternetAddress("from@server.nowhere") });
         try {
             transport.sendMessage(message, new Address[]{}); // empty address list
-            Assert.fail();
+            fail();
         } catch (MessagingException ex) {
             Thread.sleep(200);
             verify(transportListener, times(1)).messageNotDelivered(any(TransportEvent.class));
@@ -143,15 +150,15 @@ public class SmtpJmsTransportTest {
         ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(messageBuffer));
         String protocol = input.readUTF();
         Address[] inAddr = (Address[]) input.readObject();
-        Assert.assertEquals(1, inAddr.length);
+        assertEquals(1, inAddr.length);
         Assert.assertArrayEquals(sendTo, inAddr);
-        Assert.assertEquals("smtp", protocol);
+        assertEquals("smtp", protocol);
         verify(message, times(1)).writeTo(any(ObjectOutputStream.class));
         Thread.sleep(200);
         ArgumentCaptor<TransportEvent> transportEventArgumentCaptor = ArgumentCaptor.forClass(TransportEvent.class);
         verify(transportListener, times(1)).messageDelivered(transportEventArgumentCaptor.capture());
         TransportEvent event = transportEventArgumentCaptor.getValue();
-        Assert.assertEquals(message, event.getMessage());
+        assertEquals(message, event.getMessage());
         Assert.assertArrayEquals(new Address[0], event.getInvalidAddresses());
         Assert.assertArrayEquals(sendTo, event.getValidSentAddresses());
         Assert.assertArrayEquals(new Address[0], event.getValidUnsentAddresses());
@@ -167,7 +174,7 @@ public class SmtpJmsTransportTest {
         ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
         verify(bytesMessage, times(1)).setJMSPriority(captor.capture());
         Integer jmsPriority = captor.getValue();
-        Assert.assertEquals(prio, jmsPriority.intValue());
+        assertEquals(prio, jmsPriority.intValue());
     }
 
     @Test
@@ -190,7 +197,7 @@ public class SmtpJmsTransportTest {
         ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
         verify(bytesMessage, times(1)).setJMSPriority(captor.capture());
         Integer jmsPriority = captor.getValue();
-        Assert.assertEquals(priority, jmsPriority.intValue());
+        assertEquals(priority, jmsPriority.intValue());
     }
 
     @Test
@@ -210,7 +217,7 @@ public class SmtpJmsTransportTest {
         transport.sendMessage(message, new Address[] { new InternetAddress("text@xtest.nowhere") });
         ArgumentCaptor<Long> ttlLongArgumentCaptor = ArgumentCaptor.forClass(Long.class);
         verify(queueSender, times(1)).setTimeToLive(ttlLongArgumentCaptor.capture());
-        Assert.assertEquals(Long.valueOf(321), ttlLongArgumentCaptor.getValue());
+        assertEquals(Long.valueOf(321), ttlLongArgumentCaptor.getValue());
     }
 
     @Test
@@ -252,9 +259,9 @@ public class SmtpJmsTransportTest {
         Message message = Mockito.mock(Message.class);
         // X-Send-priority
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {"low"});
-        Assert.assertEquals(Integer.valueOf(1), SmtpJmsTransport.jmsPriority(message));
+        assertEquals(Integer.valueOf(1), SmtpJmsTransport.jmsPriority(message));
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {"high"});
-        Assert.assertEquals(Integer.valueOf(8), SmtpJmsTransport.jmsPriority(message));
+        assertEquals(Integer.valueOf(8), SmtpJmsTransport.jmsPriority(message));
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {});
         Assert.assertNull(SmtpJmsTransport.jmsPriority(message));
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {"normal"});
@@ -262,28 +269,28 @@ public class SmtpJmsTransportTest {
         // numeric value
         for(int p=0; p<10; p++) {
             when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[]{Integer.toString(p)});
-            Assert.assertEquals(Integer.valueOf(p), SmtpJmsTransport.jmsPriority(message));
+            assertEquals(Integer.valueOf(p), SmtpJmsTransport.jmsPriority(message));
         }
         // less or over limit
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[]{"-2"});
-        Assert.assertEquals(Integer.valueOf(0), SmtpJmsTransport.jmsPriority(message));
+        assertEquals(Integer.valueOf(0), SmtpJmsTransport.jmsPriority(message));
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[]{"12"});
-        Assert.assertEquals(Integer.valueOf(9), SmtpJmsTransport.jmsPriority(message));
+        assertEquals(Integer.valueOf(9), SmtpJmsTransport.jmsPriority(message));
         // X-Priority
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {});
         when(message.getHeader(eq(SmtpJmsTransport.X_PRIORITY))).thenReturn(new String[]{"1"});
-        Assert.assertEquals(Integer.valueOf(8), SmtpJmsTransport.jmsPriority(message));
+        assertEquals(Integer.valueOf(8), SmtpJmsTransport.jmsPriority(message));
         when(message.getHeader(eq(SmtpJmsTransport.X_PRIORITY))).thenReturn(new String[]{"2"});
-        Assert.assertEquals(Integer.valueOf(6), SmtpJmsTransport.jmsPriority(message));
+        assertEquals(Integer.valueOf(6), SmtpJmsTransport.jmsPriority(message));
         when(message.getHeader(eq(SmtpJmsTransport.X_PRIORITY))).thenReturn(new String[]{"4"});
-        Assert.assertEquals(Integer.valueOf(4), SmtpJmsTransport.jmsPriority(message));
+        assertEquals(Integer.valueOf(4), SmtpJmsTransport.jmsPriority(message));
         when(message.getHeader(eq(SmtpJmsTransport.X_PRIORITY))).thenReturn(new String[]{"5"});
-        Assert.assertEquals(Integer.valueOf(1), SmtpJmsTransport.jmsPriority(message));
+        assertEquals(Integer.valueOf(1), SmtpJmsTransport.jmsPriority(message));
         when(message.getHeader(eq(SmtpJmsTransport.X_PRIORITY))).thenReturn(new String[]{"10"}); // unmapped
         Assert.assertNull(SmtpJmsTransport.jmsPriority(message));
         // X-Send-priority over X-Send-priority header
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {"high"});
         when(message.getHeader(eq(SmtpJmsTransport.X_PRIORITY))).thenReturn(new String[]{"5"});
-        Assert.assertEquals(Integer.valueOf(8), SmtpJmsTransport.jmsPriority(message));
+        assertEquals(Integer.valueOf(8), SmtpJmsTransport.jmsPriority(message));
     }
 }

@@ -1,6 +1,10 @@
 package org.jsoftware.javamail;
 
-import javax.mail.*;
+import javax.mail.Address;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.URLName;
 import javax.mail.event.TransportEvent;
 import java.util.Arrays;
 import java.util.logging.Logger;

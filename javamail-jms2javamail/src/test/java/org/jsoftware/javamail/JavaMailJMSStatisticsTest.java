@@ -1,7 +1,6 @@
 package org.jsoftware.javamail;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -24,6 +23,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 public class JavaMailJMSStatisticsTest {
@@ -53,13 +55,13 @@ public class JavaMailJMSStatisticsTest {
     @Test
     public void testOnSuccess() throws Exception {
         javaMailJMSStatistics.onSuccess(mimeMessage, addressesTo);
-        Assert.assertEquals(1L, getMbeanAttribute("countSuccessful"));
+        assertEquals(1L, getMbeanAttribute("countSuccessful"));
     }
 
     @Test
     public void testOnFailure() throws Exception {
         javaMailJMSStatistics.onFailure(mimeMessage, addressesTo, new IllegalArgumentException());
-        Assert.assertEquals(1L, getMbeanAttribute("countFailure"));
+        assertEquals(1L, getMbeanAttribute("countFailure"));
     }
 
     @Test
@@ -68,9 +70,9 @@ public class JavaMailJMSStatisticsTest {
         Thread.sleep(2000);
         javaMailJMSStatistics.onSuccess(mimeMessage, addressesTo);
         javaMailJMSStatistics.invoke("reset", new Object[0], new String[0]);
-        Assert.assertEquals(0L, getMbeanAttribute("countSuccessful"));
+        assertEquals(0L, getMbeanAttribute("countSuccessful"));
         Date d = (Date) getMbeanAttribute("statisticsCollectionStartDate");
-        Assert.assertTrue(d.after(date));
+        assertTrue(d.after(date));
     }
 
     @Test
@@ -88,7 +90,7 @@ public class JavaMailJMSStatisticsTest {
         // cleanup
         platformMBeanServer.removeNotificationListener(JavaMailJMSStatistics.JMX_OBJECT_NAME, listener);
         // check
-        Assert.assertEquals(JavaMailJMSStatistics.NOTIFICATION_TYPE_SUCCESS, result.toString());
+        assertEquals(JavaMailJMSStatistics.NOTIFICATION_TYPE_SUCCESS, result.toString());
     }
 
     @Test
@@ -102,14 +104,14 @@ public class JavaMailJMSStatisticsTest {
     public void testMessageInfo() throws Exception {
         javaMailJMSStatistics.onFailure(mimeMessage, addressesTo, new IllegalStateException());
         CompositeData info = (CompositeData) getMbeanAttribute("lastFailureMailInfo");
-        Assert.assertTrue(info.get("date") instanceof Date);
-        Assert.assertTrue(info.get("errorDescription").toString().contains("IllegalStateException"));
+        assertTrue(info.get("date") instanceof Date);
+        assertTrue(info.get("errorDescription").toString().contains("IllegalStateException"));
         TabularData tab = (TabularData) info.get("headers");
-        Assert.assertEquals(2, tab.size());
-        Assert.assertEquals("MessageId", info.get("messageId"));
+        assertEquals(2, tab.size());
+        assertEquals("MessageId", info.get("messageId"));
         tab = (TabularData) info.get("toAddresses");
-        Assert.assertEquals(1, tab.size());
-        Assert.assertEquals("MessageSubject", info.get("subject"));
+        assertEquals(1, tab.size());
+        assertEquals("MessageSubject", info.get("subject"));
     }
 
     @Test
@@ -121,17 +123,17 @@ public class JavaMailJMSStatisticsTest {
         for(Attribute attribute : list) {
             if (attrNames.contains(attribute.getName())) {
                 Object val = attribute.getValue();
-                Assert.assertTrue(val instanceof Number);
+                assertTrue(val instanceof Number);
                 continue;
             }
-            Assert.fail("There is more attributes then expected - " + attribute);
+            fail("There is more attributes then expected - " + attribute);
         }
     }
 
     @Test
     public void testGetAttributesEmpty() throws Exception {
         AttributeList attributeList = javaMailJMSStatistics.getAttributes(new String[0]);
-        Assert.assertEquals(0, attributeList.size());
+        assertEquals(0, attributeList.size());
     }
 
     @Test(expected = Exception.class)
