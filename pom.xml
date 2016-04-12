@@ -12,7 +12,7 @@
 	</parent>
 
 	<url>https://github.com/m-szalik/javamail/wiki</url>
-	<name>JavaMail extensions for javaMail 1.5.5 (jdk7).</name>
+	<name>Javamail: Extensions for JavaMail 1.5.5 (jdk7)</name>
 
     <licenses>
         <license>
