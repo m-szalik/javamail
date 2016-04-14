@@ -27,6 +27,8 @@ import java.lang.management.ManagementFactory;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Ejb bean collecting JavaMail usage statistics and expose them via JMX.
@@ -38,6 +40,7 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
     public static final String NOTIFICATION_TYPE_SUCCESS = "JavaMail-Send-Success";
     public static final String JAVA_MAIL_SEND_FAILURE = "JavaMail-Send-Failure";
     public static final ObjectName JMX_OBJECT_NAME;
+    private static final Logger logger = Logger.getLogger(JavaMailJMSStatistics.class.getName());
 
     private MBeanServer platformMBeanServer;
     private static final MBeanInfo M_BEAN_INFO;
@@ -147,7 +150,7 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
             notification.setUserData(sb.toString());
             sendNotification(notification);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            logger.log(Level.WARNING, "Cannot send MxBean notification.", ex);
         }
     }
 
@@ -179,7 +182,7 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
                     new Object[]{maa.getMessage().getMessageID(), new Date(maa.getTimestamp()), maa.getMessage().getSubject(), addrData, headerData, error}
             );
         } catch (OpenDataException | MessagingException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException("cannot convert MessageAndAddresses to CompositeData", e);
         }
     }
 
@@ -194,7 +197,7 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
                 Object value = getAttribute(attributeName);
                 resultList.add(new Attribute(attributeName, value));
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException("Cannot get attribute " + attributeName, e);
             }
         }
         return resultList;
@@ -231,7 +234,7 @@ public class JavaMailJMSStatistics extends NotificationBroadcasterSupport implem
             try {
                 setAttribute(attribute);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException("Cannot set value '" + attribute.getValue() + "' for " + attribute.getName(), e);
             }
         }
         return attributes;
