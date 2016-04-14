@@ -1,6 +1,5 @@
 package org.jsoftware.javamail;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -31,6 +30,8 @@ import java.util.Properties;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -86,9 +87,9 @@ public class SmtpJmsTransportTest {
             TransportEvent event = transportEventArgumentCaptor.getValue();
             assertEquals(message, event.getMessage());
             assertEquals(TransportEvent.MESSAGE_NOT_DELIVERED, event.getType());
-            Assert.assertArrayEquals(new Address[0], event.getInvalidAddresses());
-            Assert.assertArrayEquals(new Address[0], event.getValidSentAddresses());
-            Assert.assertArrayEquals(sendTo, event.getValidUnsentAddresses());
+            assertArrayEquals(new Address[0], event.getInvalidAddresses());
+            assertArrayEquals(new Address[0], event.getValidSentAddresses());
+            assertArrayEquals(sendTo, event.getValidUnsentAddresses());
         }
     }
 
@@ -107,18 +108,22 @@ public class SmtpJmsTransportTest {
 
 
     @Test
-    public void testDoNotCheckFormHeader() {
-        try {
-            Properties properties = new Properties();
-            properties.setProperty("mail.smtpjms.validateFrom", "false");
-            SmtpJmsTransport transport = new SmtpJmsTransport(Session.getInstance(properties), new URLName("jms"));
-            Message message = Mockito.mock(Message.class);
-            transport.sendMessage(message, new Address[]{new InternetAddress("text@xtest.nowhere")});
-            // no exception = ok
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            fail("An exception - " + ex);
-        }
+    public void testDoNotCheckFormHeader() throws Exception {
+        Properties properties = new Properties();
+        properties.setProperty("mail.smtpjms.validateFrom", "false");
+        SmtpJmsTransport transport = new SmtpJmsTransport(Session.getInstance(properties), new URLName("jms"));
+        Message message = Mockito.mock(Message.class);
+        TransportListener listener = Mockito.mock(TransportListener.class);
+        Address[] to = new Address[]{ new InternetAddress("text@xtest.nowhere") };
+        transport.addTransportListener(listener);
+        transport.sendMessage(message, to);
+        Thread.sleep(200);
+        ArgumentCaptor<TransportEvent> transportEventArgumentCaptor = ArgumentCaptor.forClass(TransportEvent.class);
+        verify(listener).messageDelivered(transportEventArgumentCaptor.capture());
+        TransportEvent event = transportEventArgumentCaptor.getValue();
+        assertEquals(message, event.getMessage());
+        assertEquals(TransportEvent.MESSAGE_DELIVERED, event.getType());
+        assertArrayEquals(to, event.getValidSentAddresses());
     }
 
 
@@ -131,7 +136,7 @@ public class SmtpJmsTransportTest {
             fail();
         } catch (MessagingException ex) {
             Thread.sleep(200);
-            verify(transportListener, times(1)).messageNotDelivered(any(TransportEvent.class));
+            verify(transportListener).messageNotDelivered(any(TransportEvent.class));
         }
     }
 
@@ -147,12 +152,12 @@ public class SmtpJmsTransportTest {
         ArgumentCaptor<byte[]> bytesCaptor = ArgumentCaptor.forClass(byte[].class);
         verify(bytesMessage, times(1)).writeBytes(bytesCaptor.capture());
         byte[] messageBuffer = bytesCaptor.getValue();
-        Assert.assertNotNull(messageBuffer);
+        assertNotNull(messageBuffer);
         ObjectInputStream input = new ObjectInputStream(new ByteArrayInputStream(messageBuffer));
         String protocol = input.readUTF();
         Address[] inAddr = (Address[]) input.readObject();
         assertEquals(1, inAddr.length);
-        Assert.assertArrayEquals(sendTo, inAddr);
+        assertArrayEquals(sendTo, inAddr);
         assertEquals("smtp", protocol);
         verify(message, times(1)).writeTo(any(ObjectOutputStream.class));
         Thread.sleep(200);
@@ -160,9 +165,9 @@ public class SmtpJmsTransportTest {
         verify(transportListener, times(1)).messageDelivered(transportEventArgumentCaptor.capture());
         TransportEvent event = transportEventArgumentCaptor.getValue();
         assertEquals(message, event.getMessage());
-        Assert.assertArrayEquals(new Address[0], event.getInvalidAddresses());
-        Assert.assertArrayEquals(sendTo, event.getValidSentAddresses());
-        Assert.assertArrayEquals(new Address[0], event.getValidUnsentAddresses());
+        assertArrayEquals(new Address[0], event.getInvalidAddresses());
+        assertArrayEquals(sendTo, event.getValidSentAddresses());
+        assertArrayEquals(new Address[0], event.getValidUnsentAddresses());
     }
 
     @Test
@@ -272,9 +277,9 @@ public class SmtpJmsTransportTest {
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {"high"});
         assertEquals(Integer.valueOf(8), SmtpJmsTransport.jmsPriority(message));
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {});
-        Assert.assertNull(SmtpJmsTransport.jmsPriority(message));
+        assertNull(SmtpJmsTransport.jmsPriority(message));
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {"normal"});
-        Assert.assertNull(SmtpJmsTransport.jmsPriority(message));
+        assertNull(SmtpJmsTransport.jmsPriority(message));
         // numeric value
         for(int p=0; p<10; p++) {
             when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[]{Integer.toString(p)});
@@ -296,7 +301,7 @@ public class SmtpJmsTransportTest {
         when(message.getHeader(eq(SmtpJmsTransport.X_PRIORITY))).thenReturn(new String[]{"5"});
         assertEquals(Integer.valueOf(1), SmtpJmsTransport.jmsPriority(message));
         when(message.getHeader(eq(SmtpJmsTransport.X_PRIORITY))).thenReturn(new String[]{"10"}); // unmapped
-        Assert.assertNull(SmtpJmsTransport.jmsPriority(message));
+        assertNull(SmtpJmsTransport.jmsPriority(message));
         // X-Send-priority over X-Send-priority header
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {"high"});
         when(message.getHeader(eq(SmtpJmsTransport.X_PRIORITY))).thenReturn(new String[]{"5"});
