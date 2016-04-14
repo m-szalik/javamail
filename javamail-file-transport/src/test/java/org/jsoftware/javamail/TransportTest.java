@@ -4,9 +4,11 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import javax.mail.Address;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
@@ -28,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -106,8 +109,17 @@ public class TransportTest {
 
     @Test
     public void transportNOPTest() throws MessagingException {
+        TransportListener transportListener = Mockito.mock(TransportListener.class);
+        Message message = generateMessage();
         Transport transport = session.getTransport("nop");
-        transport.sendMessage(generateMessage(), toAddress);
+        transport.addTransportListener(transportListener);
+        transport.sendMessage(message, toAddress);
+        ArgumentCaptor<TransportEvent> transportEventArgumentCaptor = ArgumentCaptor.forClass(TransportEvent.class);
+        verify(transportListener).messageDelivered(transportEventArgumentCaptor.capture());
+        TransportEvent event = transportEventArgumentCaptor.getValue();
+        assertEquals(message, event.getMessage());
+        assertEquals(TransportEvent.MESSAGE_DELIVERED, event.getType());
+        assertArrayEquals(toAddress, event.getValidSentAddresses());
     }
 
     @Test
@@ -124,12 +136,20 @@ public class TransportTest {
 
     @Test
     public void testListenerOnSuccess() throws Exception {
+        Address[] to = new Address[] {new InternetAddress("to@server.nowhere")};
+        Message message = generateMessage();
         TransportListener transportListener = Mockito.mock(TransportListener.class);
         AbstractFileTransport transport = (AbstractFileTransport) session.getTransport("filemsg");
         transport.addTransportListener(transportListener);
-        transport.sendMessage(generateMessage(), new Address[] {new InternetAddress("to@server.nowhere")});
+        transport.sendMessage(message, to);
         Thread.sleep(200);
-        verify(transportListener, times(1)).messageDelivered(any(TransportEvent.class));
+        ArgumentCaptor<TransportEvent> transportEventArgumentCaptor = ArgumentCaptor.forClass(TransportEvent.class);
+        verify(transportListener).messageDelivered(transportEventArgumentCaptor.capture());
+        TransportEvent event = transportEventArgumentCaptor.getValue();
+        assertEquals(message, event.getMessage());
+        assertEquals(TransportEvent.MESSAGE_DELIVERED, event.getType());
+        assertArrayEquals(to, event.getValidSentAddresses());
+        verify(transportListener).messageDelivered(any(TransportEvent.class));
     }
 
     @Test

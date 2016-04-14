@@ -29,6 +29,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -166,15 +167,15 @@ public class SmtpJmsTransportTest {
 
     @Test
     public void testSendNumberPriority() throws Exception {
-        final int prio = 4;
+        final int priority = 4;
         Message message = Mockito.mock(Message.class);
-        when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[]{Integer.toString(prio)});
+        when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[]{Integer.toString(priority)});
         when(message.getFrom()).thenReturn(new Address[] { new InternetAddress("from@server.com") });
         transport.sendMessage(message, new Address[] { new InternetAddress("text@xtest.nowhere") });
         ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
         verify(bytesMessage, times(1)).setJMSPriority(captor.capture());
         Integer jmsPriority = captor.getValue();
-        assertEquals(prio, jmsPriority.intValue());
+        assertEquals(priority, jmsPriority.intValue());
     }
 
     @Test
@@ -223,13 +224,21 @@ public class SmtpJmsTransportTest {
     @Test
     public void testFailOnJms() throws Exception {
         Message message = Mockito.mock(Message.class);
+        Address[] to = new Address[] { new InternetAddress("text@xtest.nowhere") };
         when(message.getFrom()).thenReturn(new Address[] { new InternetAddress("from@server.com") });
         doThrow(new JMSException("mock")).when(queueSender).send(any(javax.jms.Message.class));
         try {
-            transport.sendMessage(message, new Address[]{new InternetAddress("text@xtest.nowhere")});
+            transport.sendMessage(message, to);
+            fail();
         } catch (MessagingException ex) {
             Thread.sleep(200);
-            verify(transportListener).messageNotDelivered(any(TransportEvent.class));
+            ArgumentCaptor<TransportEvent> transportEventArgumentCaptor = ArgumentCaptor.forClass(TransportEvent.class);
+            verify(transportListener).messageNotDelivered(transportEventArgumentCaptor.capture());
+            TransportEvent event = transportEventArgumentCaptor.getValue();
+            assertEquals(message, event.getMessage());
+            assertEquals(TransportEvent.MESSAGE_NOT_DELIVERED, event.getType());
+            assertArrayEquals(new Address[0], event.getValidSentAddresses());
+            assertArrayEquals(to, event.getValidUnsentAddresses());
         }
     }
 

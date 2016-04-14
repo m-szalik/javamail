@@ -12,6 +12,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.management.Attribute;
 import javax.management.AttributeList;
+import javax.management.MBeanInfo;
 import javax.management.MBeanServer;
 import javax.management.Notification;
 import javax.management.NotificationListener;
@@ -24,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
@@ -96,8 +98,9 @@ public class JavaMailJMSStatisticsTest {
     @Test
     public void testJmxMBeanInfo() throws Exception {
         MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
-        platformMBeanServer.getMBeanInfo(JavaMailJMSStatistics.JMX_OBJECT_NAME);
+        MBeanInfo mBeanInfo = platformMBeanServer.getMBeanInfo(JavaMailJMSStatistics.JMX_OBJECT_NAME);
         // no exceptions = ok
+        assertNotNull(mBeanInfo);
     }
 
     @Test
