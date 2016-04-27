@@ -103,10 +103,10 @@ public class AbstractTransportTest {
     @Test
     public void testConnectClose() throws Exception {
         transport.connect();
-        Thread.sleep(200);
+        waitForListeners();
         verify(connectionListener, times(1)).opened(any(ConnectionEvent.class));
         transport.close();
-        Thread.sleep(200);
+        waitForListeners();
         verify(connectionListener).disconnected(any(ConnectionEvent.class));
         verify(connectionListener).closed(any(ConnectionEvent.class));
     }
@@ -117,9 +117,13 @@ public class AbstractTransportTest {
             message.setFrom((String) null);
             transport.validateAndPrepare(message, new Address[]{});
         } finally {
-            Thread.sleep(200);
+            waitForListeners();
             verify(transportListener).messageNotDelivered(any(TransportEvent.class));
         }
+    }
+
+    public static void waitForListeners() throws InterruptedException {
+        Thread.sleep(500);
     }
 
 }

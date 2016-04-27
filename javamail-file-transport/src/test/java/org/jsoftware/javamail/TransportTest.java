@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import static org.jsoftware.javamail.AbstractTransportTest.waitForListeners;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -142,7 +143,7 @@ public class TransportTest {
         AbstractFileTransport transport = (AbstractFileTransport) session.getTransport("filemsg");
         transport.addTransportListener(transportListener);
         transport.sendMessage(message, to);
-        Thread.sleep(200);
+        waitForListeners();
         ArgumentCaptor<TransportEvent> transportEventArgumentCaptor = ArgumentCaptor.forClass(TransportEvent.class);
         verify(transportListener).messageDelivered(transportEventArgumentCaptor.capture());
         TransportEvent event = transportEventArgumentCaptor.getValue();
@@ -164,7 +165,7 @@ public class TransportTest {
             transport.sendMessage(message, new Address[]{new InternetAddress("to@server.nowhere")});
             Assert.fail("Exception expected");
         } catch (MessagingException ex) {
-            Thread.sleep(200);
+            waitForListeners();
             verify(transportListener, times(1)).messageNotDelivered(any(TransportEvent.class));
         }
     }

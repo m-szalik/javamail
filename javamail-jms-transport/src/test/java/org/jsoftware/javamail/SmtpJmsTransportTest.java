@@ -81,7 +81,7 @@ public class SmtpJmsTransportTest {
             transport.sendMessage(message, sendTo);
             fail();
         } catch (MessagingException ex) {
-            Thread.sleep(200);
+            waitForListeners();
             ArgumentCaptor<TransportEvent> transportEventArgumentCaptor = ArgumentCaptor.forClass(TransportEvent.class);
             verify(transportListener, times(1)).messageNotDelivered(transportEventArgumentCaptor.capture());
             TransportEvent event = transportEventArgumentCaptor.getValue();
@@ -101,7 +101,7 @@ public class SmtpJmsTransportTest {
             transport.sendMessage(message, new Address[]{new InternetAddress("text@xtest.nowhere")});
             fail();
         } catch (MessagingException ex) {
-            Thread.sleep(200);
+            waitForListeners();
             verify(transportListener, times(1)).messageNotDelivered(any(TransportEvent.class));
         }
     }
@@ -117,7 +117,7 @@ public class SmtpJmsTransportTest {
         Address[] to = new Address[]{ new InternetAddress("text@xtest.nowhere") };
         transport.addTransportListener(listener);
         transport.sendMessage(message, to);
-        Thread.sleep(200);
+        waitForListeners();
         ArgumentCaptor<TransportEvent> transportEventArgumentCaptor = ArgumentCaptor.forClass(TransportEvent.class);
         verify(listener).messageDelivered(transportEventArgumentCaptor.capture());
         TransportEvent event = transportEventArgumentCaptor.getValue();
@@ -135,7 +135,7 @@ public class SmtpJmsTransportTest {
             transport.sendMessage(message, new Address[]{}); // empty address list
             fail();
         } catch (MessagingException ex) {
-            Thread.sleep(200);
+            waitForListeners();
             verify(transportListener).messageNotDelivered(any(TransportEvent.class));
         }
     }
@@ -160,7 +160,7 @@ public class SmtpJmsTransportTest {
         assertArrayEquals(sendTo, inAddr);
         assertEquals("smtp", protocol);
         verify(message, times(1)).writeTo(any(ObjectOutputStream.class));
-        Thread.sleep(200);
+        waitForListeners();
         ArgumentCaptor<TransportEvent> transportEventArgumentCaptor = ArgumentCaptor.forClass(TransportEvent.class);
         verify(transportListener, times(1)).messageDelivered(transportEventArgumentCaptor.capture());
         TransportEvent event = transportEventArgumentCaptor.getValue();
@@ -236,7 +236,7 @@ public class SmtpJmsTransportTest {
             transport.sendMessage(message, to);
             fail();
         } catch (MessagingException ex) {
-            Thread.sleep(200);
+            waitForListeners();
             ArgumentCaptor<TransportEvent> transportEventArgumentCaptor = ArgumentCaptor.forClass(TransportEvent.class);
             verify(transportListener).messageNotDelivered(transportEventArgumentCaptor.capture());
             TransportEvent event = transportEventArgumentCaptor.getValue();
@@ -263,7 +263,7 @@ public class SmtpJmsTransportTest {
         try {
             transport.sendMessage(message, new Address[]{new InternetAddress("text@xtest.nowhere")});
         } finally {
-            Thread.sleep(200);
+            waitForListeners();
             verify(transportListener).messageNotDelivered(any(TransportEvent.class));
         }
     }
@@ -306,5 +306,9 @@ public class SmtpJmsTransportTest {
         when(message.getHeader(eq(SmtpJmsTransport.X_SEND_PRIORITY))).thenReturn(new String[] {"high"});
         when(message.getHeader(eq(SmtpJmsTransport.X_PRIORITY))).thenReturn(new String[]{"5"});
         assertEquals(Integer.valueOf(8), SmtpJmsTransport.jmsPriority(message));
+    }
+
+    private static void waitForListeners() throws InterruptedException {
+        Thread.sleep(500);
     }
 }
