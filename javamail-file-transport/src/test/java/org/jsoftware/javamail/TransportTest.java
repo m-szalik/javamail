@@ -109,12 +109,13 @@ public class TransportTest {
     }
 
     @Test
-    public void transportNOPTest() throws MessagingException {
+    public void transportNOPTest() throws Exception {
         TransportListener transportListener = Mockito.mock(TransportListener.class);
         Message message = generateMessage();
         Transport transport = session.getTransport("nop");
         transport.addTransportListener(transportListener);
         transport.sendMessage(message, toAddress);
+        waitForListeners();
         ArgumentCaptor<TransportEvent> transportEventArgumentCaptor = ArgumentCaptor.forClass(TransportEvent.class);
         verify(transportListener).messageDelivered(transportEventArgumentCaptor.capture());
         TransportEvent event = transportEventArgumentCaptor.getValue();
