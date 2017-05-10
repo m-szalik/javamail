@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>javamail</artifactId>
-    <version>1.5.6-SNAPSHOT</version>
+	<version>1.5.6-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<parent>
@@ -23,7 +23,7 @@
     </licenses>
 
     <properties>
-        <javamail.version>1.5.5</javamail.version> <!-- this is for jetty example only -->
+        <javamail.version>1.5.6</javamail.version> <!-- this is for jetty example only -->
     </properties>
 
     <dependencies>
@@ -55,13 +55,13 @@
             <dependency>
                 <groupId>javax.mail</groupId>
                 <artifactId>javax.mail-api</artifactId>
-                <version>1.5.5</version> <!-- cannot use ${javamail.version} variable here because VersionEye doesn't support that -->
+                <version>1.5.6</version> <!-- cannot use ${javamail.version} variable here because VersionEye doesn't support that -->
             </dependency>
             <!-- test and examples sub-projects dependencies below -->
             <dependency>
                 <groupId>com.sun.mail</groupId>
                 <artifactId>javax.mail</artifactId>
-                <version>1.5.5</version>
+                <version>1.5.6</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
@@ -83,7 +83,6 @@
         <url>https://github.com/m-szalik/javamail.git</url>
         <connection>scm:git:https://github.com/m-szalik/javamail.git</connection>
         <developerConnection>scm:git:https://github.com/m-szalik/javamail.git</developerConnection>
-      <tag>javamail-1.5.5</tag>
   </scm>
 
     <issueManagement>
